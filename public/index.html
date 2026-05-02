@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Did You Get Started? — REACHUM × Cowen</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛳</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF8;--bg2:#F0EFEB;--bg3:#E5E4DF;--text:#1A1917;--text2:#6B6A65;--text3:#9C9B96;--accent:#2D5A3D;--accent-light:rgba(45,90,61,.08);--accent-mid:rgba(45,90,61,.15);--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',-apple-system,sans-serif}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+.app{max-width:540px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.intro-icon{font-size:48px;margin-bottom:20px}
+.intro h1{font-family:var(--serif);font-size:28px;font-weight:400;margin-bottom:8px}
+.intro .sub{font-size:13px;color:var(--text3);margin-bottom:24px;letter-spacing:.05em;text-transform:uppercase}
+.intro p{font-size:15px;color:var(--text2);line-height:1.65;max-width:380px;margin-bottom:32px}
+.btn{padding:13px 40px;border-radius:28px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;transition:transform .15s,opacity .15s}
+.btn:hover{opacity:.9}.btn:active{transform:scale(.97)}.btn:disabled{background:var(--bg3);cursor:default}
+.btn-sm{padding:8px 18px;font-size:12px;border-radius:20px}
+.btn-outline{background:transparent;border:1px solid var(--accent-mid);color:var(--accent)}
+.btn-outline:hover{background:var(--accent-light)}
+.header{padding:16px 20px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:12px}
+.header-icon{font-size:20px}.header h2{font-family:var(--serif);font-size:18px;font-weight:400}.header span{font-size:11px;color:var(--text3)}
+.messages{flex:1;overflow-y:auto;padding:16px 16px 8px;scroll-behavior:smooth}
+.msg{margin-bottom:10px;display:flex;flex-direction:column;animation:fadeIn .3s ease}
+.msg.agent{align-items:flex-start}.msg.user{align-items:flex-end}
+.bubble{max-width:85%;padding:11px 16px;font-size:14px;line-height:1.6}
+.agent .bubble{background:var(--bg2);border-radius:18px 18px 18px 4px;color:var(--text)}
+.user .bubble{background:var(--accent);border-radius:18px 18px 4px 18px;color:#fff}
+.vc{background:var(--accent-light);border-radius:12px;padding:14px;margin-top:10px;border:1px solid var(--accent-mid);overflow:hidden;transition:all .5s ease}
+.vc.reveal{border:2px solid var(--accent);background:rgba(45,90,61,.1)}
+.vc.collapsed{max-height:0;padding:0 14px;margin-top:0;opacity:0;border-width:0}
+.vc-tag{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.vc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.vc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.vc-icon.m{background:var(--accent);color:#fff}.vc-icon.n{background:var(--accent-mid);color:var(--accent)}
+.vc-name{font-size:15px;font-weight:600}.vc-dur{font-size:12px;color:var(--text2)}
+.vc-sum{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.vc-vid{width:100%;border-radius:8px;background:#000;margin-bottom:8px;display:block}
+.vc-vid.h{display:none}
+.input-bar{border-top:1px solid var(--bg3);padding:12px 16px;display:flex;gap:8px;background:var(--bg)}
+.input-bar input{flex:1;padding:11px 16px;border-radius:24px;border:1px solid var(--bg3);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;outline:none}
+.input-bar input:focus{border-color:var(--accent-mid)}
+.send-btn{padding:11px 22px;border-radius:24px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer}
+.send-btn:disabled{background:var(--bg3);cursor:default}
+.explore{text-align:center;margin:16px 0;padding:16px;border-radius:12px;background:var(--accent-light)}
+.explore p{font-size:13px;color:var(--text2);margin-bottom:12px}
+.explore-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.typing{display:inline-flex;gap:4px;padding:14px 18px;background:var(--bg2);border-radius:18px 18px 18px 4px;margin-bottom:10px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:pulse 1.2s ease infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:1;transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.app{max-width:100%}.intro h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+// Client knows only filenames — everything else is server-side
+const V="https://reachum-video-assets.s3.us-east-1.amazonaws.com/golf-origins/";
+const F={irwin:"Hale-Irwin.mp4",trevino:"Lee-Trevino.mp4",inkster:"Juli-Inkster.mp4",creamer:"Paula-Creamer.mp4",furyk:"Jim-Furyk.mp4",north:"Andy-North_1.mp4",sorenstam:"Annika-Sorenstam.mp4",rice:"Condeleeza-Rice.mp4",palmer:"Arnold-Palmer.mp4",miller:"Johnny-Miller_1.mp4",omeara:"Mark-O-Meara.mp4",davies:"Laura-Davies.mp4",pavin:"Corey-Pavin.mp4",rose:"Justin-Rose_1.mp4",kite:"Tom-Kite.mp4",spieth:"Jordan-Spieth.mp4",goosen:"Retief-Goosen.mp4",strange:"Curtis-Strange-Answer_1.mp4"};
+
+const sid=crypto.randomUUID();
+const S={step:"intro",msgs:[],convo:[],origin:"",rc:null,shown:[],wait:false,load:false,done:false,match:null};
+const $=document.getElementById("app");
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function scroll(){setTimeout(()=>{const e=document.getElementById("m");if(e)e.scrollTop=e.scrollHeight},80)}
+
+async function api(body){
+  const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  return r.json();
+}
+
+function addA(t,vid,rev,name,dur,sum){S.msgs.push({r:"a",t,vid,rev:!!rev,name:name||"",dur:dur||"",sum:sum||""})}
+function addU(t){S.msgs.push({r:"u",t})}
+
+function render(){
+  if(S.step==="intro"){$.innerHTML=`<div class="intro"><div class="intro-icon">⛳</div><h1>How did you get started?</h1><div class="sub">REACHUM × Cowen</div><p>Every golfer has an origin story. Tell us yours — and find out which legend started the same way you did.</p><button class="btn" onclick="go()">Start</button></div>`;return}
+
+  let h=S.msgs.map((m,i)=>{
+    let o=`<div class="msg ${m.r==="a"?"agent":"user"}"><div class="bubble">${esc(m.t)}`;
+    if(m.vid){
+      const cid=`c${i}`,vid=`v${i}`;
+      o+=`<div class="vc ${m.rev?'reveal':''}" id="${cid}">`;
+      if(m.rev)o+=`<div class="vc-tag">Your match</div>`;
+      o+=`<div class="vc-head"><div class="vc-icon ${m.rev?'m':'n'}">▶</div><div><div class="vc-name">${esc(m.name)}</div>${m.dur?`<div class="vc-dur">${m.dur}</div>`:''}</div></div>`;
+      if(m.rev&&m.sum)o+=`<div class="vc-sum">${esc(m.sum)}</div>`;
+      o+=`<video class="vc-vid h" id="${vid}" controls preload="metadata" playsinline><source src="${V}${F[m.vid]}" type="video/mp4"></video>`;
+      o+=`<button class="btn btn-sm" style="width:100%" onclick="play('${vid}','${cid}',${i})">${m.rev?'Watch their story':'Watch clip'}</button>`;
+      o+=`</div>`;
+    }
+    o+=`</div></div>`;return o;
+  }).join("");
+
+  if(S.load)h+=`<div class="msg agent"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  if(S.wait)h+=`<div style="text-align:center;padding:8px;font-size:12px;color:var(--text3)">Watch the clip to continue</div>`;
+
+  if(S.done){
+    h+=`<div class="explore"><p>Your origin story. Their origin story. Same thread.</p><div class="explore-btns"><button class="btn btn-sm btn-outline" onclick="more('similar')">Similar story</button><button class="btn btn-sm btn-outline" onclick="more('opposite')">Opposite path</button></div></div>`;
+  }
+
+  const off=S.done||S.wait||S.load;
+  $.innerHTML=`<div class="header"><div class="header-icon">⛳</div><div><h2>How did you get started?</h2><span>REACHUM × Cowen</span></div></div><div class="messages" id="m">${h}</div>${!S.done?`<div class="input-bar"><input id="i" type="text" placeholder="${off?(S.wait?'Watch the clip…':'Thinking…'):'Reply…'}" ${off?'disabled':''} /><button class="send-btn" id="b" ${off?'disabled':''}>Send</button></div>`:''}`;
+
+  const inp=document.getElementById("i"),btn=document.getElementById("b");
+  if(inp){inp.addEventListener("keydown",e=>{if(e.key==="Enter")send()});if(!off)setTimeout(()=>inp.focus(),50)}
+  if(btn)btn.addEventListener("click",send);
+  scroll();
+}
+
+function play(vid,cid,idx){
+  const v=document.getElementById(vid),c=document.getElementById(cid);
+  if(!v)return;
+  v.classList.remove("h");v.play();
+  c.querySelector(".btn").style.display="none";
+  v.addEventListener("ended",()=>{
+    setTimeout(()=>{
+      v.classList.add("h");c.classList.add("collapsed");
+      setTimeout(()=>{
+        S.wait=false;
+        const m=S.msgs[idx];
+        if(m&&m._cb&&!m._d){m._d=true;m._cb()}
+        render();
+      },500);
+    },1000);
+  },{once:true});
+}
+
+function go(){
+  S.step="chat";
+  addA("How did you get started in golf? Not the handicap — the story. Who put a club in your hand, and why'd you keep swinging?");
+  render();
+}
+
+async function send(){
+  const inp=document.getElementById("i");
+  if(!inp||!inp.value.trim()||S.wait||S.load)return;
+  const t=inp.value.trim();inp.value="";
+  addU(t);
+
+  if(!S.origin){
+    S.origin=t;
+    S.load=true;render();
+    const start=await api({action:"start"});
+    S.load=false;
+    S.rc=start.clipId;S.shown.push(start.clipId);
+    S.wait=true;
+    const idx=S.msgs.length;
+    const msg={r:"a",t:"Here's how one legend answered that same question.",vid:start.clipId,rev:false,name:start.clipName,dur:start.clipDur||"",sum:"",
+      _cb:async()=>{
+        S.load=true;render();
+        S.convo.push({role:"user",content:`Here's my golf origin story: "${t}"\n\nI just watched ${start.clipName}'s clip. Remember: I already told you my story. Do NOT re-ask anything I covered. Go deeper.`});
+        const r=await api({action:"chat",messages:S.convo,origin:S.origin,randomClip:S.rc});
+        S.load=false;
+        if(r.text){S.convo.push({role:"assistant",content:r.text});addA(r.text)}
+        else addA("What kept you coming back after those early rounds?");
+        render();
+      }};
+    S.msgs.push(msg);render();return;
+  }
+
+  S.convo.push({role:"user",content:t});
+  S.load=true;render();
+  const r=await api({action:"chat",messages:S.convo,origin:S.origin,randomClip:S.rc});
+  S.load=false;
+
+  if(!r.text&&!r.match){addA("Tell me more about that part.");S.convo.push({role:"assistant",content:"Tell me more about that part."});render();return}
+
+  if(r.match){
+    S.convo.push({role:"assistant",content:r.text||""});
+    S.shown.push(r.match);S.match=r.match;S.wait=true;S.step="reveal";
+    const idx=S.msgs.length;
+    const msg={r:"a",t:r.text||"You know who started almost the same way you did?",vid:r.match,rev:true,name:r.matchName,dur:"",sum:r.matchSummary||"",
+      _cb:()=>{
+        S.done=true;
+        addA(`${r.matchName}. Different era, different world — but the same thread.`);
+        api({action:"log",sessionId:sid,origin:S.origin,messages:S.convo,matchClip:r.match,clipsShown:S.shown,timestamp:new Date().toISOString()});
+        render();
+      }};
+    S.msgs.push(msg);render();return;
+  }
+
+  S.convo.push({role:"assistant",content:r.text});
+  addA(r.text);render();
+}
+
+async function more(mode){
+  const r=await api({action:"find",messages:S.convo,shownClips:S.shown,mode});
+  if(!r.clipId)return;
+  S.shown.push(r.clipId);
+  const label=mode==="opposite"?"Now here's someone whose path couldn't be more different.":"Here's another golfer with a similar thread.";
+  addA(label,r.clipId,mode!=="opposite",r.clipName,"",r.clipSummary||"");
+  render();scroll();
+}
+
+render();
+</script>
+</body>
+</html>
