@@ -81,6 +81,8 @@
     function render(){
         if(S.step==="intro"){$.innerHTML=`<div class="intro"><div class="intro-icon">⛳</div><h1>How did you get started?</h1><div class="sub">REACHUM × Cowen</div><p>Every golfer has an origin story. Tell us yours — and find out which legend started the same way you did.</p><button class="btn" onclick="go()">Start</button></div>`;return}
 
+        if(S.step==="consent"){$.innerHTML=`<div class="intro"><div class="intro-icon">⛳</div><h1>Before we begin</h1><p style="font-size:14px;color:var(--text2);line-height:1.7;max-width:400px;margin-bottom:24px">This experience uses AI to personalize your conversation. Your responses are collected anonymously to help us improve the experience. No personal information is stored.</p><p style="font-size:13px;color:var(--text3);margin-bottom:32px;max-width:400px">By continuing, you agree to this collection.</p><button class="btn" onclick="acceptConsent()">I agree — let's go</button></div>`;return}
+
         let h=S.msgs.map((m,i)=>{
             let o=`<div class="msg ${m.r==="a"?"agent":"user"}"><div class="bubble">${esc(m.t)}`;
             if(m.vid){
@@ -131,6 +133,18 @@
     }
 
     function go(){
+        if(localStorage.getItem("golf_consent")){
+            S.step="chat";
+            addA("How did you get started in golf? Not the handicap — the story. Who put a club in your hand, and why'd you keep swinging?");
+            render();
+        } else {
+            S.step="consent";
+            render();
+        }
+    }
+
+    function acceptConsent(){
+        localStorage.setItem("golf_consent","yes");
         S.step="chat";
         addA("How did you get started in golf? Not the handicap — the story. Who put a club in your hand, and why'd you keep swinging?");
         render();
