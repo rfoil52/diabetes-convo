@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Practice — The Wellness Dialogue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Karla:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #2E1A5B;
+    --purple-deep: #1F1140;
+    --gold: #C8A24B;
+    --gold-light: #E8D9B3;
+    --body: #3D3D45;
+    --muted: #8A8A95;
+    --bg: #FAF7F2;
+    --rule: #E8DFD0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  body {
+    font-family: 'Karla', sans-serif;
+    background: var(--bg);
+    color: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(ellipse at top, rgba(46, 26, 91, 0.025) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 28px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 24px;
+    margin-bottom: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .institution {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    color: var(--purple);
+  }
+
+  .program-label {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .pageindicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .pageindicator-pill {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--rule);
+  }
+
+  .pageindicator-pill.active { background: var(--purple); }
+  .pageindicator-pill.complete { background: var(--gold); }
+
+  .pageindicator-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .hero { margin-bottom: 56px; }
+
+  .eyebrow {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(36px, 6.5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--purple);
+    margin-bottom: 24px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .lede {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--body);
+    font-style: italic;
+  }
+
+  .section { margin-bottom: 48px; }
+
+  p { margin-bottom: 18px; }
+  p strong { font-weight: 600; color: var(--purple-deep); }
+
+  .claims {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 40px 0;
+  }
+
+  .claim {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 20px;
+    padding: 28px 0;
+    border-top: 1px solid var(--rule);
+    align-items: start;
+  }
+
+  .claim:last-child { border-bottom: 1px solid var(--rule); }
+
+  .claim-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 42px;
+    line-height: 1;
+    color: var(--gold);
+  }
+
+  .claim-body { padding-top: 6px; }
+
+  .claim-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.25;
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+
+  .claim-text {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--body);
+  }
+
+  .pullquote {
+    margin: 56px 0 0;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+  }
+
+  .pullquote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.4;
+    color: var(--purple);
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header, .hero, .section, .pullquote {
+    animation: fadein 0.8s ease both;
+  }
+  .hero { animation-delay: 0.1s; }
+  .section { animation-delay: 0.2s; }
+  .pullquote { animation-delay: 0.3s; }
+
+  @media (max-width: 480px) {
+    .container { padding: 32px 20px 56px; }
+    h1 { font-size: 36px; }
+    .lede { font-size: 19px; }
+    .claim { grid-template-columns: 44px 1fr; gap: 14px; padding: 24px 0; }
+    .claim-number { font-size: 34px; }
+    .claim-headline { font-size: 19px; }
+    .pullquote-text { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="program-label">The Wellness Dialogue · Practice Program</div>
+    <div class="institution">The Wright Center for Community Health</div>
+  </div>
+
+  <div class="pageindicator">
+    <span class="pageindicator-pill active"></span>
+    <span class="pageindicator-pill"></span>
+    <span class="pageindicator-pill"></span>
+    <span class="pageindicator-label">Part 1 of 3</span>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">Why this matters</div>
+    <h1>Knowing the targets isn't the same as <em>reaching them</em>.</h1>
+    <p class="lede">Every Wright provider already knows the targets. The gap isn't knowledge — it's what happens at minute eleven of a busy visit.</p>
+  </div>
+
+  <div class="section">
+    <p>You know that hypertension control means under 140/80. You know A1C control means under 9. You know which patients are due for which screening. The clinical knowledge is in place.</p>
+    <p>What value-based care asks of you is different. It asks that the knowledge becomes <strong>reflex</strong> — that the wellness conversation happens in the medication-refill visit, in the dizziness visit, in the visit that ran over schedule. Not when there's time. Always.</p>
+    <p>Reflex is what this training is designed to build.</p>
+  </div>
+
+  <div class="claims">
+    <div class="claim">
+      <div class="claim-number">i</div>
+      <div class="claim-body">
+        <div class="claim-headline">Training that teaches knowledge changes what you know.</div>
+        <div class="claim-text">Lectures, modules, and reading material build the foundation. Every provider here has that foundation. It is necessary but not sufficient.</div>
+      </div>
+    </div>
+    <div class="claim">
+      <div class="claim-number">ii</div>
+      <div class="claim-body">
+        <div class="claim-headline">Training that teaches reflex changes what you do.</div>
+        <div class="claim-text">Reflex is built only through repetition under realistic pressure. Reading about a conversation does not change behavior. Practicing the conversation does.</div>
+      </div>
+    </div>
+    <div class="claim">
+      <div class="claim-number">iii</div>
+      <div class="claim-body">
+        <div class="claim-headline">Role-play is how you build the reflex.</div>
+        <div class="claim-text">You'll practice The Wellness Dialogue with patients who respond, push back, and adapt — exactly as your patients do — until the dialogue becomes the way you conduct any encounter.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pullquote">
+    <div class="pullquote-text">"The objective is not providers who recite a structure. It is providers for whom the dialogue is the way they practice."</div>
+  </div>
+
+</div>
+</body>
+</html>

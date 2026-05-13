@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Wellness Dialogue — The Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Karla:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #2E1A5B;
+    --purple-deep: #1F1140;
+    --gold: #C8A24B;
+    --gold-light: #E8D9B3;
+    --body: #3D3D45;
+    --muted: #8A8A95;
+    --bg: #FAF7F2;
+    --rule: #E8DFD0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  body {
+    font-family: 'Karla', sans-serif;
+    background: var(--bg);
+    color: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(ellipse at top, rgba(46, 26, 91, 0.025) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 28px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 24px;
+    margin-bottom: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .institution {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    color: var(--purple);
+  }
+
+  .program-label {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .pageindicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .pageindicator-pill {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--rule);
+  }
+
+  .pageindicator-pill.active { background: var(--purple); }
+  .pageindicator-pill.complete { background: var(--gold); }
+
+  .pageindicator-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .hero { margin-bottom: 56px; }
+
+  .eyebrow {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(36px, 6.5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--purple);
+    margin-bottom: 24px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .lede {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--body);
+    font-style: italic;
+  }
+
+  .principle {
+    margin: 56px 0;
+    padding: 40px 32px;
+    background: var(--purple);
+    color: var(--bg);
+    position: relative;
+    border-radius: 2px;
+  }
+
+  .principle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gold);
+  }
+
+  .principle-label {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .principle-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.3;
+    color: var(--bg);
+  }
+
+  .checkpoints-intro { margin: 48px 0 24px; }
+
+  .section-label {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.2;
+    color: var(--purple);
+    margin-bottom: 18px;
+  }
+
+  p { margin-bottom: 18px; }
+  p strong { font-weight: 600; color: var(--purple-deep); }
+
+  .checkpoints {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin: 24px 0 48px;
+  }
+
+  .checkpoint {
+    padding: 24px 4px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 20px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .checkpoint:first-child { border-top: none; }
+
+  .checkpoint-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 21px;
+    color: var(--purple);
+  }
+
+  .checkpoint-target {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .patterns { margin: 48px 0 0; }
+
+  .pattern-group { margin-bottom: 32px; }
+
+  .pattern-group-label {
+    font-family: 'Karla', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pattern-group.works .pattern-group-label { color: var(--purple); }
+  .pattern-group.fails .pattern-group-label { color: var(--gold); }
+
+  .pattern-group-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .pattern {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    align-items: start;
+  }
+
+  .pattern-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--gold);
+    padding-top: 2px;
+  }
+
+  .pattern.fails .pattern-mark {
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  .pattern-body strong {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--purple);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .pattern.fails .pattern-body strong {
+    color: var(--muted);
+  }
+
+  .pattern-body p {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--body);
+    margin-bottom: 0;
+  }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header, .hero, .principle, .checkpoints-intro, .patterns {
+    animation: fadein 0.8s ease both;
+  }
+  .hero { animation-delay: 0.05s; }
+  .principle { animation-delay: 0.15s; }
+  .checkpoints-intro { animation-delay: 0.25s; }
+  .patterns { animation-delay: 0.35s; }
+
+  @media (max-width: 480px) {
+    .container { padding: 32px 20px 56px; }
+    h1 { font-size: 36px; }
+    .lede { font-size: 19px; }
+    .principle { padding: 32px 24px; }
+    .principle-text { font-size: 22px; }
+    .checkpoint { grid-template-columns: 1fr; gap: 6px; padding: 22px 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="program-label">The Wellness Dialogue · Practice Program</div>
+    <div class="institution">The Wright Center for Community Health</div>
+  </div>
+
+  <div class="pageindicator">
+    <span class="pageindicator-pill complete"></span>
+    <span class="pageindicator-pill active"></span>
+    <span class="pageindicator-pill"></span>
+    <span class="pageindicator-label">Part 2 of 3</span>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">The practice</div>
+    <h1>A defined way of <em>engaging the patient</em> at every encounter.</h1>
+    <p class="lede">The Wellness Dialogue is a method, not a topic. It can be conducted in any visit, regardless of the presenting complaint.</p>
+  </div>
+
+  <div class="principle">
+    <div class="principle-label">The core principle</div>
+    <div class="principle-text">"The presenting complaint is the entry point — not the boundary."</div>
+  </div>
+
+  <div class="section">
+    <p>Traditional encounters treat the chief complaint as the scope of the visit. The Wellness Dialogue treats it as the <strong>opening move</strong> of a broader conversation. The workup you'd conduct anyway becomes the natural surface for questions about blood pressure, diabetes, and screening — because those questions are <em>connected to</em> the workup, not appended to it.</p>
+  </div>
+
+  <div class="checkpoints-intro">
+    <div class="section-label">The three checkpoints</div>
+    <h2>Every encounter advances at least one.</h2>
+    <p>You don't address all three at every visit. You listen for the opening each checkpoint offers, and use it when it appears.</p>
+  </div>
+
+  <div class="checkpoints">
+    <div class="checkpoint">
+      <div class="checkpoint-name">Blood pressure control</div>
+      <div class="checkpoint-target">Target &lt; 140/80</div>
+    </div>
+    <div class="checkpoint">
+      <div class="checkpoint-name">Diabetes control</div>
+      <div class="checkpoint-target">A1C &lt; 9</div>
+    </div>
+    <div class="checkpoint">
+      <div class="checkpoint-name">Age-appropriate screening</div>
+      <div class="checkpoint-target">Current or overdue</div>
+    </div>
+  </div>
+
+  <div class="patterns">
+
+    <div class="pattern-group works">
+      <div class="pattern-group-label">Patterns that work</div>
+
+      <div class="pattern">
+        <div class="pattern-mark">i</div>
+        <div class="pattern-body">
+          <strong>Connect the workup question to the complaint.</strong>
+          <p>"Dizziness when you stand up can sometimes relate to blood pressure — let's check yours now." The wellness question is medically relevant to the visit, not adjacent to it.</p>
+        </div>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-mark">ii</div>
+        <div class="pattern-body">
+          <strong>Translate clinical numbers into patient-actionable terms.</strong>
+          <p>"Your reading is 145 over 90. Our target for you is under 140 over 80. That's the difference between staying on the path you're on and reducing your stroke risk." Numbers without translation are not actionable.</p>
+        </div>
+      </div>
+
+      <div class="pattern">
+        <div class="pattern-mark">iii</div>
+        <div class="pattern-body">
+          <strong>Close with a concrete forward commitment.</strong>
+          <p>The encounter ends with at least one specific next step the patient has agreed to. "Let's keep an eye on things" is not a forward commitment.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-group fails">
+      <div class="pattern-group-label">The pattern to watch for in yourself</div>
+
+      <div class="pattern fails">
+        <div class="pattern-mark">×</div>
+        <div class="pattern-body">
+          <strong>Steamrolling patient resistance.</strong>
+          <p>When the patient pushes back — "I came in for the dizziness, not for a physical" — the job is to acknowledge and re-anchor, not to push through. Steamrolling produces compliance in the room and disengagement after the visit. This is the failure mode most providers fall into, and the one role-play is designed to surface.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
