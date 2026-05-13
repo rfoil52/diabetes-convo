@@ -101,7 +101,7 @@
     margin-left: 8px;
   }
 
-  .hero { margin-bottom: 48px; }
+  .hero { margin-bottom: 40px; }
 
   .eyebrow {
     font-family: 'Karla', sans-serif;
@@ -116,8 +116,8 @@
   h1 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 500;
-    font-size: clamp(36px, 6.5vw, 56px);
-    line-height: 1.05;
+    font-size: clamp(40px, 7.5vw, 64px);
+    line-height: 1.02;
     letter-spacing: -0.01em;
     color: var(--purple);
     margin-bottom: 24px;
@@ -129,19 +129,10 @@
     font-weight: 400;
   }
 
-  .lede {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 400;
-    font-size: 22px;
-    line-height: 1.45;
-    color: var(--body);
-    font-style: italic;
-  }
-
   /* Patient card */
   .patient-card {
-    margin: 48px 0;
-    padding: 36px 32px;
+    margin: 40px 0;
+    padding: 32px 32px;
     background: #fff;
     border: 1px solid var(--rule);
     border-left: 4px solid var(--gold);
@@ -171,25 +162,21 @@
     margin-bottom: 20px;
   }
 
-  .patient-detail {
-    font-size: 16px;
+  .patient-summary {
+    font-size: 17px;
     line-height: 1.6;
     color: var(--body);
-    margin-bottom: 14px;
   }
 
-  .patient-detail:last-child { margin-bottom: 0; }
-
-  .patient-detail strong {
+  .patient-summary strong {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
     font-style: italic;
     color: var(--purple);
-    font-size: 17px;
+    font-size: 18px;
   }
 
-  /* What you're practicing */
-  .section { margin-bottom: 48px; }
+  .section { margin-bottom: 40px; }
 
   .section-label {
     font-family: 'Karla', sans-serif;
@@ -204,51 +191,53 @@
   h2 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
-    font-size: 30px;
+    font-size: 28px;
     line-height: 1.2;
     color: var(--purple);
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
 
-  p { margin-bottom: 18px; }
-  p strong { font-weight: 600; color: var(--purple-deep); }
-
-  /* Scoring criteria */
+  /* Compact criteria list */
   .criteria {
-    margin: 24px 0 0;
+    margin-top: 16px;
     border-top: 1px solid var(--rule);
   }
 
   .criterion {
-    padding: 20px 0;
+    padding: 16px 0;
     border-bottom: 1px solid var(--rule);
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  .criterion-title {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
     font-style: italic;
     font-size: 18px;
     color: var(--purple);
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 12px;
+    align-items: baseline;
   }
 
-  .criterion-desc {
-    font-size: 15.5px;
-    line-height: 1.55;
-    color: var(--body);
+  .criterion-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--gold);
+    font-weight: 500;
   }
 
-  /* Practical instructions */
+  /* Practical note */
   .practical {
-    margin: 56px 0 0;
-    padding: 32px 28px;
+    margin-top: 40px;
+    padding: 24px 28px;
     background: var(--purple);
-    color: var(--bg);
+    color: var(--gold-light);
     border-radius: 2px;
     position: relative;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.4;
+    text-align: center;
   }
 
   .practical::before {
@@ -261,56 +250,15 @@
     background: var(--gold);
   }
 
-  .practical-label {
+  .practical-meta {
     font-family: 'Karla', sans-serif;
-    font-weight: 600;
-    font-size: 11px;
-    letter-spacing: 0.2em;
+    font-style: normal;
+    font-size: 12px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--gold);
-    margin-bottom: 16px;
-  }
-
-  .practical-items {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .practical-item {
-    font-family: 'Karla', sans-serif;
-    font-size: 15.5px;
-    line-height: 1.55;
-    color: var(--bg);
-    padding-left: 18px;
-    position: relative;
-  }
-
-  .practical-item::before {
-    content: '·';
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 700;
-    font-size: 24px;
-    color: var(--gold);
-    position: absolute;
-    left: 0;
-    top: -4px;
-  }
-
-  .practical-item strong {
     font-weight: 600;
-    color: var(--gold-light);
-  }
-
-  .practical-close {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(232, 217, 179, 0.2);
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 18px;
-    line-height: 1.45;
-    color: var(--gold-light);
+    margin-bottom: 10px;
   }
 
   @keyframes fadein {
@@ -328,12 +276,12 @@
 
   @media (max-width: 480px) {
     .container { padding: 32px 20px 56px; }
-    h1 { font-size: 36px; }
-    .lede { font-size: 19px; }
-    .patient-card { padding: 28px 24px; }
+    h1 { font-size: 38px; }
+    .patient-card { padding: 24px 22px; }
     .patient-name { font-size: 24px; }
-    .practical { padding: 28px 22px; }
-    .practical-close { font-size: 16px; }
+    h2 { font-size: 24px; }
+    .criterion { font-size: 16px; }
+    .practical { padding: 20px 22px; font-size: 17px; }
   }
 </style>
 </head>
@@ -355,55 +303,31 @@
   <div class="hero">
     <div class="eyebrow">Your practice session</div>
     <h1>Margaret came in for <em>dizziness</em>.</h1>
-    <p class="lede">In a moment you'll speak with her. Your task is to take the dizziness seriously while using the encounter as an opening for The Wellness Dialogue.</p>
   </div>
 
   <div class="patient-card">
     <div class="patient-name">Margaret Okafor</div>
     <div class="patient-meta">Age 58 · Administrative coordinator</div>
     <div class="patient-rule"></div>
-    <p class="patient-detail"><strong>Presenting complaint.</strong> Intermittent dizziness for about three weeks — mild but persistent enough that her daughter pushed her to come in.</p>
-    <p class="patient-detail"><strong>Background.</strong> Generally healthy. Hasn't had a physical in three years. Past BP readings have been "a little high" but no one has discussed them with her. Family history of Type 2 diabetes. Overdue on screening.</p>
-    <p class="patient-detail"><strong>Disposition.</strong> Practical, engaged, willing to talk. Will resist if the conversation drifts too far from her stated reason for the visit.</p>
+    <p class="patient-summary">Three weeks of intermittent dizziness. No physical in three years. Past BP has been "a little high" but never addressed. Family history of Type 2 diabetes. <strong>She came in for the dizziness — and will resist if the conversation drifts.</strong></p>
   </div>
 
   <div class="section">
-    <div class="section-label">What you're practicing</div>
-    <h2>The session is scored on five things.</h2>
-    <p>Margaret is responding to your choices in real time. The scoring assesses how you handle the encounter — not whether you diagnose perfectly.</p>
+    <div class="section-label">Scored on five things</div>
+    <h2>How you handle the encounter.</h2>
 
     <div class="criteria">
-      <div class="criterion">
-        <div class="criterion-title">Take the chief complaint seriously.</div>
-        <div class="criterion-desc">Engage substantively with the dizziness before pivoting to anything else.</div>
-      </div>
-      <div class="criterion">
-        <div class="criterion-title">Surface the BP conversation naturally.</div>
-        <div class="criterion-desc">Introduce blood pressure as part of the dizziness workup, not as a separate topic.</div>
-      </div>
-      <div class="criterion">
-        <div class="criterion-title">Connect wellness questions to her concern.</div>
-        <div class="criterion-desc">Make the bridge between the immediate complaint and the longitudinal picture explicit.</div>
-      </div>
-      <div class="criterion">
-        <div class="criterion-title">Handle resistance without abandoning the dialogue.</div>
-        <div class="criterion-desc">When she pushes back, acknowledge and re-anchor — don't push through, don't retreat.</div>
-      </div>
-      <div class="criterion">
-        <div class="criterion-title">Close with a clear, agreed next step.</div>
-        <div class="criterion-desc">The encounter ends with Margaret committed to a specific forward action.</div>
-      </div>
+      <div class="criterion"><span class="criterion-num">i</span><span>Take the chief complaint seriously.</span></div>
+      <div class="criterion"><span class="criterion-num">ii</span><span>Surface BP naturally.</span></div>
+      <div class="criterion"><span class="criterion-num">iii</span><span>Connect wellness questions to her concern.</span></div>
+      <div class="criterion"><span class="criterion-num">iv</span><span>Handle resistance without retreat.</span></div>
+      <div class="criterion"><span class="criterion-num">v</span><span>Close with a clear, agreed next step.</span></div>
     </div>
   </div>
 
   <div class="practical">
-    <div class="practical-label">Before you begin</div>
-    <div class="practical-items">
-      <div class="practical-item">The conversation is <strong>live audio</strong>. Margaret will speak first.</div>
-      <div class="practical-item">You have <strong>five minutes</strong>. Speak naturally — there is no script.</div>
-      <div class="practical-item">Aim for a real conversation, <strong>not a perfect one</strong>. The point is practice.</div>
-    </div>
-    <div class="practical-close">"The training is successful when the practice disappears into the way you care."</div>
+    <div class="practical-meta">Before you begin</div>
+    Live audio · 5 minutes · Margaret speaks first. Aim for real, not perfect.
   </div>
 
 </div>
