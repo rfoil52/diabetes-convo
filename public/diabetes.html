@@ -25,7 +25,12 @@
 
         /* WELCOME */
         .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:20px}
-        .welcome-vid{width:100%;max-width:560px;border-radius:14px;background:#000;display:block;box-shadow:0 2px 24px rgba(31,30,26,.07)}
+        .welcome-media{position:relative;width:100%;max-width:560px}
+        .welcome-vid{width:100%;border-radius:14px;background:#000;display:block;box-shadow:0 2px 24px rgba(31,30,26,.07)}
+        .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;border:none;background:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .3s ease}
+        .play-btn:hover,.play-btn:focus-visible{transform:translate(-50%,-50%) scale(1.05)}
+        .play-btn::before{content:"";display:block;margin-left:7px;border-left:28px solid #fff;border-top:17px solid transparent;border-bottom:17px solid transparent}
+        .welcome-cap{font-size:12px;color:var(--text3);line-height:1.5}
         .welcome-note{font-size:14px;color:var(--text2);line-height:1.6;max-width:420px}
         .welcome-actions{display:flex;flex-direction:column;align-items:center;gap:14px}
         .skip{background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--text3);cursor:pointer;padding:6px 10px}
@@ -36,9 +41,13 @@
         .btn-outline{background:transparent;border:1px solid var(--accent-mid);color:var(--accent)}
         .btn-outline:hover{background:var(--accent-light)}
 
-        /* CONVERSATION */
+        /* CONVERSATION — history flows upward above a vertically centered interaction unit.
+           .history and .tail each take an equal share of the leftover space, which parks
+           the interaction unit at the vertical center of the stage. */
         .convo{flex:1;display:flex;flex-direction:column;min-height:0}
-        .messages{flex:1;overflow-y:auto;padding:24px 24px 8px;scroll-behavior:smooth}
+        .history{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 24px;scroll-behavior:smooth}
+        .history-inner{margin-top:auto;padding-top:24px}
+        .tail{flex:1 1 0;min-height:0}
         .msg{margin-bottom:14px;display:flex;flex-direction:column}
         .msg.agent{flex-direction:row;align-items:flex-start;gap:10px}.msg.user{align-items:flex-end}
         .bubble{max-width:82%;padding:14px 20px;font-size:16px;line-height:1.7}
@@ -57,9 +66,10 @@
         .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
         @keyframes pulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:1;transform:scale(1)}}
 
-        /* ROTATING PROMPT */
-        .prompt-wrap{padding:6px 24px 0;min-height:44px;display:flex;align-items:flex-end;flex-shrink:0}
-        .prompt{font-family:var(--serif);font-size:21px;font-weight:400;color:var(--text2);line-height:1.3;opacity:1;transition:opacity .7s ease}
+        /* INTERACTION UNIT — rotating question + input, held at the vertical center */
+        .interaction{flex-shrink:0;padding:20px 24px 0}
+        .prompt-wrap{min-height:44px;display:flex;align-items:flex-end;margin-bottom:18px}
+        .prompt{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--text2);line-height:1.25;opacity:1;transition:opacity .7s ease}
         .prompt.out{opacity:0}
 
         /* PRESENCE — one persistent element at the input, state-driven */
@@ -72,7 +82,7 @@
         @media(prefers-reduced-motion:reduce){.presence{animation:none !important}}
 
         /* INPUT */
-        .input-bar{padding:12px 24px 14px;display:flex;align-items:center;gap:10px;background:var(--bg);flex-shrink:0}
+        .input-bar{display:flex;align-items:center;gap:10px;background:var(--bg);flex-shrink:0}
         .input-bar input{flex:1;min-width:0;padding:13px 18px;border-radius:26px;border:1px solid var(--bg3);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;outline:none}
         .input-bar input:focus{border-color:var(--accent-mid)}
         .send-btn{padding:13px 24px;border-radius:26px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;flex-shrink:0;white-space:nowrap}
@@ -90,7 +100,10 @@
             .header h1{font-size:18px}
             .header .sub{font-size:11px}
             .welcome{padding:20px 16px;gap:16px}
-            .messages{padding:16px 14px 6px}
+            .play-btn{width:76px;height:76px}
+            .play-btn::before{margin-left:6px;border-left-width:23px;border-top-width:14px;border-bottom-width:14px}
+            .history{padding:0 14px}
+            .history-inner{padding-top:16px}
             .bubble{max-width:88%;padding:12px 16px;font-size:15px}
             .agent .bubble{max-width:calc(88% - 20px)}
             .msg.agent{gap:8px}
@@ -98,9 +111,10 @@
             .vc{max-width:92%;padding:11px;margin-left:20px}
             .typing{margin-left:20px}
             .vc-name{font-size:16px}
-            .prompt-wrap{padding:4px 16px 0;min-height:38px}
-            .prompt{font-size:18px}
-            .input-bar{padding:10px 14px 12px;gap:8px}
+            .interaction{padding:16px 14px 0}
+            .prompt-wrap{min-height:38px;margin-bottom:16px}
+            .prompt{font-size:24px}
+            .input-bar{gap:8px}
             .input-bar input{padding:12px 14px;font-size:16px}
             .send-btn{padding:12px 18px;font-size:15px}
             .btn{font-size:15px;padding:13px 32px}
@@ -114,8 +128,8 @@
             .bubble{font-size:17px;padding:16px 22px}
             .dot{margin-top:21px}
             .vc-name{font-size:19px}
-            .prompt{font-size:24px}
-            .prompt-wrap{min-height:50px}
+            .prompt{font-size:32px}
+            .prompt-wrap{min-height:52px;margin-bottom:20px}
         }
     </style>
 </head>
@@ -132,9 +146,13 @@
     <div class="stage">
         <!-- WELCOME -->
         <section class="welcome" id="welcome">
-            <video class="welcome-vid" id="wvid" muted autoplay playsinline preload="auto"></video>
+            <div class="welcome-media">
+                <video class="welcome-vid" id="wvid" playsinline preload="metadata"></video>
+                <button class="play-btn" id="play" aria-label="Play the welcome message"></button>
+            </div>
+            <p class="welcome-cap">A message from Randall, then a library of voices.</p>
             <div class="welcome-actions">
-                <button class="btn" id="unmute">Turn sound on</button>
+                <button class="btn" id="unmute" hidden>Turn sound on</button>
                 <button class="skip" id="skip">Skip and start talking →</button>
             </div>
             <p class="welcome-note" id="wnote"></p>
@@ -142,13 +160,16 @@
 
         <!-- CONVERSATION -->
         <section class="convo" id="convo" hidden>
-            <div class="messages" id="messages"></div>
-            <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
-            <div class="input-bar">
-                <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
-                <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
-                <button class="send-btn" id="send">Send</button>
+            <div class="history" id="history"><div class="history-inner" id="messages"></div></div>
+            <div class="interaction">
+                <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
+                <div class="input-bar">
+                    <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
+                    <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
+                    <button class="send-btn" id="send">Send</button>
+                </div>
             </div>
+            <div class="tail" aria-hidden="true"></div>
         </section>
     </div>
 
@@ -186,37 +207,45 @@
     }
 
     function scrollDown(){
-        const m = $("messages");
-        setTimeout(() => { m.scrollTop = m.scrollHeight; }, 60);
+        const h = $("history");
+        setTimeout(() => { h.scrollTop = h.scrollHeight; }, 60);
     }
 
     /* ---------- WELCOME ---------- */
+
+    function welcomeFailed(){
+        $("wnote").textContent = "Trouble loading the welcome video. You can start the conversation whenever you're ready.";
+        $("play").hidden = true;
+        $("unmute").hidden = true;
+        $("skip").textContent = "Start talking →";
+    }
 
     async function loadWelcome(){
         let data = {};
         try { data = await api({action: "start"}); } catch (e) { data = {}; }
 
-        if (!data || !data.welcomeUrl) {
-            $("wnote").textContent = "Trouble loading the welcome video. You can start the conversation whenever you're ready.";
-            $("unmute").hidden = true;
-            $("skip").textContent = "Start talking →";
-            return;
-        }
+        if (!data || !data.welcomeUrl) { welcomeFailed(); return; }
 
         const v = $("wvid");
         v.src = data.welcomeUrl;
         v.addEventListener("ended", startConversation, {once: true});
-        v.addEventListener("error", () => {
-            $("wnote").textContent = "Trouble loading the welcome video. You can start the conversation whenever you're ready.";
-            $("unmute").hidden = true;
-            $("skip").textContent = "Start talking →";
-        }, {once: true});
-
-        // Autoplay is only permitted while muted; the unmute button is the user gesture.
-        v.play().catch(() => {
-            $("unmute").textContent = "Play with sound";
-        });
+        v.addEventListener("error", welcomeFailed, {once: true});
+        // No autoplay — the video waits on the play button.
     }
+
+    $("play").addEventListener("click", () => {
+        const v = $("wvid");
+        v.muted = false;
+        v.volume = 1;
+        $("play").hidden = true;
+        // An explicit click almost always clears autoplay policy, but if sound is still
+        // blocked, fall back to muted playback and offer the unmute button.
+        v.play().catch(() => {
+            v.muted = true;
+            $("unmute").hidden = false;
+            v.play().catch(welcomeFailed);
+        });
+    });
 
     $("unmute").addEventListener("click", () => {
         const v = $("wvid");
