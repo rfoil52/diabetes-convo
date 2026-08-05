@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Diabetes: The First 3 Months</title>
+    <meta name="description" content="A conversational library of patient voices for anyone newly diagnosed with type 2 diabetes.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='34' fill='none' stroke='%237A8C6E' stroke-width='8'/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{--bg:#FBFAF6;--bg2:#F2F0E9;--bg3:#E3E0D6;--text:#1F1E1A;--text2:#6B6A62;--text3:#9C9A90;--accent:#5F7A5F;--accent-light:rgba(95,122,95,.08);--accent-mid:rgba(95,122,95,.18);--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',-apple-system,sans-serif}
+        body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+        .app{max-width:720px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative}
+
+        /* HEADER */
+        .header{padding:18px 24px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:14px;flex-shrink:0}
+        .mark{width:22px;height:22px;border-radius:50%;border:2px solid var(--accent);flex-shrink:0}
+        .header h1{font-family:var(--serif);font-size:22px;font-weight:400;line-height:1.25}
+        .header .sub{font-size:12px;color:var(--text3);margin-top:2px}
+
+        /* STAGE */
+        .stage{flex:1;display:flex;flex-direction:column;min-height:0}
+
+        /* WELCOME */
+        .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:20px}
+        .welcome-vid{width:100%;max-width:560px;border-radius:14px;background:#000;display:block;box-shadow:0 2px 24px rgba(31,30,26,.07)}
+        .welcome-note{font-size:14px;color:var(--text2);line-height:1.6;max-width:420px}
+        .welcome-actions{display:flex;flex-direction:column;align-items:center;gap:14px}
+        .skip{background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--text3);cursor:pointer;padding:6px 10px}
+        .skip:hover{color:var(--text2)}
+
+        .btn{padding:14px 40px;border-radius:28px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .15s}
+        .btn:hover{opacity:.9}.btn:active{transform:scale(.97)}.btn:disabled{background:var(--bg3);cursor:default}
+        .btn-outline{background:transparent;border:1px solid var(--accent-mid);color:var(--accent)}
+        .btn-outline:hover{background:var(--accent-light)}
+
+        /* CONVERSATION */
+        .convo{flex:1;display:flex;flex-direction:column;min-height:0}
+        .messages{flex:1;overflow-y:auto;padding:24px 24px 8px;scroll-behavior:smooth}
+        .msg{margin-bottom:14px;display:flex;flex-direction:column}
+        .msg.agent{flex-direction:row;align-items:flex-start;gap:10px}.msg.user{align-items:flex-end}
+        .bubble{max-width:82%;padding:14px 20px;font-size:16px;line-height:1.7}
+        .agent .bubble{background:var(--bg2);border-radius:20px 20px 20px 4px;color:var(--text);max-width:calc(82% - 22px)}
+        .user .bubble{background:var(--accent);border-radius:20px 20px 4px 20px;color:#fff}
+
+        /* SPEAKING — static dot beside each agent message */
+        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);opacity:1;flex-shrink:0;margin-top:18px;box-shadow:0 0 6px rgba(95,122,95,.2)}
+
+        .vc{background:var(--accent-light);border:1px solid var(--accent-mid);border-radius:14px;padding:14px;margin:0 0 14px 22px;max-width:82%}
+        .vc-name{font-family:var(--serif);font-size:18px;font-weight:400;margin-bottom:10px;color:var(--text)}
+        .vc-vid{width:100%;border-radius:10px;background:#000;display:block}
+
+        .typing{display:inline-flex;gap:5px;padding:16px 20px;background:var(--bg2);border-radius:20px 20px 20px 4px;margin:0 0 14px 22px}
+        .typing span{width:8px;height:8px;border-radius:50%;background:var(--text3);animation:pulse 1.2s ease infinite}
+        .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+        @keyframes pulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:1;transform:scale(1)}}
+
+        /* ROTATING PROMPT */
+        .prompt-wrap{padding:6px 24px 0;min-height:44px;display:flex;align-items:flex-end;flex-shrink:0}
+        .prompt{font-family:var(--serif);font-size:21px;font-weight:400;color:var(--text2);line-height:1.3;opacity:1;transition:opacity .7s ease}
+        .prompt.out{opacity:0}
+
+        /* PRESENCE — one persistent element at the input, state-driven */
+        .presence-slot{width:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .presence{width:12px;height:12px;border-radius:50%;background:var(--accent);opacity:.7;box-shadow:0 0 7px rgba(95,122,95,.22);transition:width .4s ease,height .4s ease,opacity .4s ease}
+        .presence[data-state="listening"]{opacity:.9;animation:breathe 2s ease-in-out infinite}
+        .presence[data-state="thinking"]{width:14px;height:14px;opacity:1;animation:breathe 1.2s ease-in-out infinite}
+        .presence[data-state="playing"]{opacity:.3}
+        @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+        @media(prefers-reduced-motion:reduce){.presence{animation:none !important}}
+
+        /* INPUT */
+        .input-bar{padding:12px 24px 14px;display:flex;align-items:center;gap:10px;background:var(--bg);flex-shrink:0}
+        .input-bar input{flex:1;min-width:0;padding:13px 18px;border-radius:26px;border:1px solid var(--bg3);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;outline:none}
+        .input-bar input:focus{border-color:var(--accent-mid)}
+        .send-btn{padding:13px 24px;border-radius:26px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;flex-shrink:0;white-space:nowrap}
+        .send-btn:disabled{background:var(--bg3);cursor:default}
+
+        /* FOOTER */
+        .privacy{padding:0 24px calc(14px + env(safe-area-inset-bottom,6px));font-size:11px;line-height:1.5;color:var(--text3);text-align:center;flex-shrink:0}
+
+        [hidden]{display:none !important}
+
+        /* MOBILE */
+        @media(max-width:600px){
+            .app{max-width:100%}
+            .header{padding:14px 16px;gap:10px}
+            .header h1{font-size:18px}
+            .header .sub{font-size:11px}
+            .welcome{padding:20px 16px;gap:16px}
+            .messages{padding:16px 14px 6px}
+            .bubble{max-width:88%;padding:12px 16px;font-size:15px}
+            .agent .bubble{max-width:calc(88% - 20px)}
+            .msg.agent{gap:8px}
+            .dot{margin-top:15px}
+            .vc{max-width:92%;padding:11px;margin-left:20px}
+            .typing{margin-left:20px}
+            .vc-name{font-size:16px}
+            .prompt-wrap{padding:4px 16px 0;min-height:38px}
+            .prompt{font-size:18px}
+            .input-bar{padding:10px 14px 12px;gap:8px}
+            .input-bar input{padding:12px 14px;font-size:16px}
+            .send-btn{padding:12px 18px;font-size:15px}
+            .btn{font-size:15px;padding:13px 32px}
+            .privacy{padding:0 16px calc(12px + env(safe-area-inset-bottom,6px))}
+        }
+
+        /* LARGE DESKTOP */
+        @media(min-width:900px){
+            .app{max-width:780px}
+            .header h1{font-size:24px}
+            .bubble{font-size:17px;padding:16px 22px}
+            .dot{margin-top:21px}
+            .vc-name{font-size:19px}
+            .prompt{font-size:24px}
+            .prompt-wrap{min-height:50px}
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <header class="header">
+        <div class="mark" aria-hidden="true"></div>
+        <div>
+            <h1>Diabetes: The First 3 Months</h1>
+            <div class="sub">A library of voices for the people walking this road</div>
+        </div>
+    </header>
+
+    <div class="stage">
+        <!-- WELCOME -->
+        <section class="welcome" id="welcome">
+            <video class="welcome-vid" id="wvid" muted autoplay playsinline preload="auto"></video>
+            <div class="welcome-actions">
+                <button class="btn" id="unmute">Turn sound on</button>
+                <button class="skip" id="skip">Skip and start talking →</button>
+            </div>
+            <p class="welcome-note" id="wnote"></p>
+        </section>
+
+        <!-- CONVERSATION -->
+        <section class="convo" id="convo" hidden>
+            <div class="messages" id="messages"></div>
+            <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
+            <div class="input-bar">
+                <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
+                <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
+                <button class="send-btn" id="send">Send</button>
+            </div>
+        </section>
+    </div>
+
+    <footer class="privacy">We don't collect names, emails, or anything that connects what you share to who you are.</footer>
+</div>
+
+<script>
+    const PROMPTS = [
+        "Were you surprised?",
+        "Were you angry?",
+        "Were you scared?",
+        "Do you have any regrets?",
+        "Are you keeping it to yourself?",
+        "Has anyone in your family had diabetes?",
+        "Are you overwhelmed by the information?",
+        "What's your biggest concern right now?"
+    ];
+
+    const HOLD = 4000;   // time a prompt stays fully visible
+    const FADE = 700;    // crossfade duration — matches CSS transition
+
+    // Client state: full message history + clips already shown, sent on every chat call
+    const S = {messages: [], shownClips: [], busy: false, started: false};
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+    async function api(body){
+        const r = await fetch("/api/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        });
+        return r.json();
+    }
+
+    function scrollDown(){
+        const m = $("messages");
+        setTimeout(() => { m.scrollTop = m.scrollHeight; }, 60);
+    }
+
+    /* ---------- WELCOME ---------- */
+
+    async function loadWelcome(){
+        let data = {};
+        try { data = await api({action: "start"}); } catch (e) { data = {}; }
+
+        if (!data || !data.welcomeUrl) {
+            $("wnote").textContent = "Trouble loading the welcome video. You can start the conversation whenever you're ready.";
+            $("unmute").hidden = true;
+            $("skip").textContent = "Start talking →";
+            return;
+        }
+
+        const v = $("wvid");
+        v.src = data.welcomeUrl;
+        v.addEventListener("ended", startConversation, {once: true});
+        v.addEventListener("error", () => {
+            $("wnote").textContent = "Trouble loading the welcome video. You can start the conversation whenever you're ready.";
+            $("unmute").hidden = true;
+            $("skip").textContent = "Start talking →";
+        }, {once: true});
+
+        // Autoplay is only permitted while muted; the unmute button is the user gesture.
+        v.play().catch(() => {
+            $("unmute").textContent = "Play with sound";
+        });
+    }
+
+    $("unmute").addEventListener("click", () => {
+        const v = $("wvid");
+        v.muted = false;
+        v.volume = 1;
+        v.play().catch(() => {});
+        $("unmute").hidden = true;
+    });
+
+    $("skip").addEventListener("click", startConversation);
+
+    function startConversation(){
+        if (S.started) return;
+        S.started = true;
+        const v = $("wvid");
+        v.pause();
+        $("welcome").hidden = true;
+        $("convo").hidden = false;
+        startPromptRotation();
+        $("input").focus({preventScroll: true});
+    }
+
+    /* ---------- ROTATING PROMPT ---------- */
+
+    let promptIdx = 0, promptTimer = null, frozen = false;
+
+    function startPromptRotation(){
+        const p = $("prompt");
+        p.textContent = PROMPTS[0];
+        promptTimer = setInterval(() => {
+            if (frozen) return;
+            p.classList.add("out");
+            setTimeout(() => {
+                if (frozen) { p.classList.remove("out"); return; }
+                promptIdx = (promptIdx + 1) % PROMPTS.length;
+                p.textContent = PROMPTS[promptIdx];
+                p.classList.remove("out");
+            }, FADE);
+        }, HOLD + FADE);
+    }
+
+    function freezePrompt(){
+        if (frozen) return;
+        frozen = true;
+        clearInterval(promptTimer);
+        $("prompt").classList.remove("out"); // hold whatever is currently visible
+    }
+
+    $("input").addEventListener("focus", () => { freezePrompt(); P.focused = true; updatePresence(); });
+    $("input").addEventListener("click", freezePrompt);
+    $("input").addEventListener("blur", () => { P.focused = false; updatePresence(); });
+
+    /* ---------- CONVERSATION ---------- */
+
+    /* ---------- PRESENCE ---------- */
+
+    // One persistent circle at the input. Precedence: playing > thinking > listening > idle.
+    const P = {thinking: false, playing: 0, focused: false};
+
+    function updatePresence(){
+        const el = $("presence");
+        if (!el) return;
+        el.dataset.state = P.playing > 0 ? "playing"
+            : P.thinking ? "thinking"
+            : P.focused ? "listening"
+            : "idle";
+    }
+
+    function addBubble(role, text){
+        const d = document.createElement("div");
+        d.className = "msg " + (role === "user" ? "user" : "agent");
+        const dot = role === "user" ? "" : `<span class="dot" aria-hidden="true"></span>`;
+        d.innerHTML = `${dot}<div class="bubble">${esc(text).replace(/\n/g, "<br>")}</div>`;
+        $("messages").appendChild(d);
+        scrollDown();
+    }
+
+    function addClip(persona, url){
+        const d = document.createElement("div");
+        d.className = "vc";
+        d.innerHTML = `<div class="vc-name">${esc(persona || "A patient voice")}</div>
+            <video class="vc-vid" controls playsinline preload="metadata" src="${esc(url)}"></video>`;
+        $("messages").appendChild(d);
+        scrollDown();
+        const v = d.querySelector("video");
+        // While a patient speaks, the agent circle steps back. Counted once per element —
+        // ending playback fires both `pause` and `ended`.
+        let counted = false;
+        v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } });
+        const release = () => { if (counted) { counted = false; P.playing--; updatePresence(); } };
+        v.addEventListener("pause", release);
+        v.addEventListener("ended", release);
+        // Try to play with sound; if the browser blocks it, the controls are already there.
+        v.play().catch(() => {});
+    }
+
+    function setBusy(on){
+        S.busy = on;
+        P.thinking = on;
+        updatePresence();
+        $("input").disabled = on;
+        $("send").disabled = on;
+        const old = $("typing");
+        if (old) old.remove();
+        if (on) {
+            const t = document.createElement("div");
+            t.className = "typing";
+            t.id = "typing";
+            t.innerHTML = "<span></span><span></span><span></span>";
+            $("messages").appendChild(t);
+            scrollDown();
+        }
+    }
+
+    async function send(){
+        const inp = $("input");
+        const text = inp.value.trim();
+        if (!text || S.busy) return;
+        inp.value = "";
+        freezePrompt();
+
+        addBubble("user", text);
+        S.messages.push({role: "user", content: text});
+        setBusy(true);
+
+        let r;
+        try {
+            r = await api({action: "chat", messages: S.messages, shownClips: S.shownClips});
+        } catch (e) {
+            r = null;
+        }
+        setBusy(false);
+
+        if (!r || r.error) {
+            addBubble("agent", "Something went wrong on my end. Try that again in a moment.");
+            return;
+        }
+
+        if (r.text) {
+            S.messages.push({role: "assistant", content: r.text});
+            addBubble("agent", r.text);
+        }
+
+        if (r.match && r.matchUrl) {
+            S.shownClips.push(r.match);
+            addClip(r.matchPersona, r.matchUrl);
+        }
+
+        inp.focus({preventScroll: true});
+    }
+
+    $("send").addEventListener("click", send);
+    $("input").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+
+    loadWelcome();
+</script>
+</body>
+</html>
