@@ -166,7 +166,10 @@
             .interaction{padding:20px 0 0}
 
             /* Letterboxed, never cropped — the stacked layout's cover-crop is undone here. */
-            .clip-pane{order:2;flex:1 1 60%;max-width:480px;max-height:800px;align-self:center;padding:20px 0 0;align-items:center;justify-content:flex-start}
+            /* height:100% keeps the pane's height definite while align-self:center is in play —
+               without it the pane sizes to content, and .clip-frame (whose only child is
+               absolutely positioned) collapses to zero height and the video disappears. */
+            .clip-pane{order:2;flex:1 1 60%;max-width:480px;height:100%;max-height:800px;align-self:center;padding:20px 0 0;align-items:center;justify-content:flex-start}
             .clip-pane.empty{display:flex}
             .clip-pane.collapsed .clip-frame{max-height:none;opacity:1}
             .clip-name{order:1;font-size:19px;padding:0 0 10px}
@@ -412,16 +415,23 @@
 
     /* ---------- CLIP PANE — one persistent player, most recent clip only ---------- */
 
+    // Collapsing the video area is stacked-layout behavior only. On desktop the clip stays
+    // visible whenever a src is loaded, whatever the playback state.
+    const STACKED = window.matchMedia("(max-width: 899px)");
+
+    function collapse(on){
+        $("clipPane").classList.toggle("collapsed", on && STACKED.matches);
+    }
+
+    // Crossing into the two-column layout drops any collapse left over from mobile.
+    STACKED.addEventListener("change", e => { if (!e.matches) $("clipPane").classList.remove("collapsed"); });
+
     (function bindClipPlayer(){
         const v = $("clipVid");
         // While a patient speaks, the agent circle steps back. Counted once —
         // ending playback fires both `pause` and `ended`.
         let counted = false;
         const release = () => { if (counted) { counted = false; P.playing--; updatePresence(); } };
-        // The `collapsed` class only does anything in the stacked layout, where the video
-        // area gives its space back once a clip has run to the end. A mid-clip pause leaves
-        // it open so playback can be resumed without the layout jumping.
-        const collapse = on => $("clipPane").classList.toggle("collapsed", on);
         v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } collapse(false); });
         v.addEventListener("pause", release);
         v.addEventListener("ended", () => { release(); collapse(true); showReplay("Replay"); });
@@ -447,9 +457,9 @@
         const pane = $("clipPane");
         pane.classList.remove("empty");
         pane.classList.remove("collapsed");   // open the stacked video area for the new clip
-        // Try to play with sound; if the browser blocks it, offer an explicit play and give
-        // the space back until they take it.
-        v.play().catch(() => { pane.classList.add("collapsed"); showReplay("Play"); });
+        // Try to play with sound; if the browser blocks it, offer an explicit play. Stacked
+        // gives the space back until they take it; desktop keeps the clip on screen.
+        v.play().catch(() => { collapse(true); showReplay("Play"); });
     }
 
     function setBusy(on){
