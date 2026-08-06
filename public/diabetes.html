@@ -41,13 +41,14 @@
         .btn-outline{background:transparent;border:1px solid var(--accent-mid);color:var(--accent)}
         .btn-outline:hover{background:var(--accent-light)}
 
-        /* CONVERSATION — history flows upward above a vertically centered interaction unit.
-           .history and .tail each take an equal share of the leftover space, which parks
-           the interaction unit at the vertical center of the stage. */
-        .convo{flex:1;display:flex;flex-direction:column;min-height:0}
-        .history{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 24px;scroll-behavior:smooth}
+        /* CONVERSATION — base layout is the stacked one (< 900px): clip on top, then the
+           agent text, then the interaction unit; the whole column scrolls.
+           The two-column desktop layout is in the min-width:900px block below. */
+        .convo{flex:1;display:flex;flex-direction:column;min-height:0;overflow-y:auto;scroll-behavior:smooth}
+        .talk-pane{display:flex;flex-direction:column;flex:0 0 auto;min-height:0}
+        .history{display:flex;flex-direction:column;padding:0 24px;scroll-behavior:smooth}
         .history-inner{margin-top:auto;padding-top:24px}
-        .tail{flex:1 1 0;min-height:0}
+        .tail{display:none}
         .msg{margin-bottom:14px;display:flex;flex-direction:column}
         .msg.agent{flex-direction:row;align-items:flex-start;gap:10px}.msg.user{align-items:flex-end}
         .bubble{max-width:82%;padding:14px 20px;font-size:16px;line-height:1.7}
@@ -57,9 +58,14 @@
         /* SPEAKING — static dot beside each agent message */
         .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);opacity:1;flex-shrink:0;margin-top:18px;box-shadow:0 0 6px rgba(95,122,95,.2)}
 
-        .vc{background:var(--accent-light);border:1px solid var(--accent-mid);border-radius:14px;padding:14px;margin:0 0 14px 22px;max-width:82%}
-        .vc-name{font-family:var(--serif);font-size:18px;font-weight:400;margin-bottom:10px;color:var(--text)}
-        .vc-vid{width:100%;border-radius:10px;background:#000;display:block}
+        /* CLIP PANE — holds only the most recent clip. The video is absolutely fitted inside
+           .clip-frame so 1080x1920 source scales to fit both axes: letterboxed, never cropped. */
+        .clip-pane{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 auto;min-height:0;padding:16px 24px 0;gap:10px}
+        .clip-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--text);text-align:center}
+        .clip-frame{position:relative;width:100%;height:60vh;max-height:60vh}
+        .clip-vid{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;background:#000;border-radius:12px;display:block}
+        .replay{background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--accent);cursor:pointer;padding:4px 10px}
+        .replay:hover{opacity:.75}
 
         .typing{display:inline-flex;gap:5px;padding:16px 20px;background:var(--bg2);border-radius:20px 20px 20px 4px;margin:0 0 14px 22px}
         .typing span{width:8px;height:8px;border-radius:50%;background:var(--text3);animation:pulse 1.2s ease infinite}
@@ -93,6 +99,14 @@
 
         [hidden]{display:none !important}
 
+        /* STACKED VIEWPORTS — before any clip has been surfaced there is nothing to stack,
+           so the interaction unit keeps the centered position it had on arrival. */
+        @media(max-width:899px){
+            .clip-pane[hidden]+.talk-pane{flex:1 1 auto}
+            .clip-pane[hidden]+.talk-pane .history{flex:1 1 0;min-height:0;overflow-y:auto}
+            .clip-pane[hidden]+.talk-pane .tail{display:block;flex:1 1 0;min-height:0}
+        }
+
         /* MOBILE */
         @media(max-width:600px){
             .app{max-width:100%}
@@ -108,9 +122,9 @@
             .agent .bubble{max-width:calc(88% - 20px)}
             .msg.agent{gap:8px}
             .dot{margin-top:15px}
-            .vc{max-width:92%;padding:11px;margin-left:20px}
             .typing{margin-left:20px}
-            .vc-name{font-size:16px}
+            .clip-pane{padding:12px 14px 0}
+            .clip-name{font-size:16px}
             .interaction{padding:16px 14px 0}
             .prompt-wrap{min-height:38px;margin-bottom:16px}
             .prompt{font-size:24px}
@@ -121,15 +135,27 @@
             .privacy{padding:0 16px calc(12px + env(safe-area-inset-bottom,6px))}
         }
 
-        /* LARGE DESKTOP */
+        /* LARGE DESKTOP — two columns: interaction on the left, clip on the right.
+           Widened container so the 40% column stays comfortably above its 320px minimum. */
         @media(min-width:900px){
-            .app{max-width:780px}
+            .app{max-width:1080px}
             .header h1{font-size:24px}
             .bubble{font-size:17px;padding:16px 22px}
             .dot{margin-top:21px}
-            .vc-name{font-size:19px}
             .prompt{font-size:32px}
             .prompt-wrap{min-height:52px;margin-bottom:20px}
+
+            .convo{flex-direction:row;align-items:stretch;gap:28px;padding:0 24px;overflow:hidden}
+            .talk-pane{order:1;flex:0 0 40%;min-width:320px}
+            .clip-pane[hidden]+.talk-pane{margin-inline:auto}
+            .history{flex:1 1 0;min-height:0;overflow-y:auto;padding:0}
+            .history-inner{padding-top:20px}
+            .tail{display:block;flex:1 1 0;min-height:0}
+            .interaction{padding:20px 0 0}
+
+            .clip-pane{order:2;flex:1 1 60%;max-width:480px;padding:20px 0;justify-content:center}
+            .clip-name{font-size:19px}
+            .clip-frame{flex:1 1 auto;height:auto;max-height:none}
         }
     </style>
 </head>
@@ -160,16 +186,25 @@
 
         <!-- CONVERSATION -->
         <section class="convo" id="convo" hidden>
-            <div class="history" id="history"><div class="history-inner" id="messages"></div></div>
-            <div class="interaction">
-                <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
-                <div class="input-bar">
-                    <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
-                    <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
-                    <button class="send-btn" id="send">Send</button>
+            <div class="clip-pane" id="clipPane" hidden>
+                <div class="clip-name" id="clipName"></div>
+                <div class="clip-frame">
+                    <video class="clip-vid" id="clipVid" controls playsinline preload="metadata"></video>
                 </div>
+                <button class="replay" id="replay" hidden>Replay</button>
             </div>
-            <div class="tail" aria-hidden="true"></div>
+            <div class="talk-pane">
+                <div class="history" id="history"><div class="history-inner" id="messages"></div></div>
+                <div class="interaction">
+                    <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
+                    <div class="input-bar">
+                        <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
+                        <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
+                        <button class="send-btn" id="send">Send</button>
+                    </div>
+                </div>
+                <div class="tail" aria-hidden="true"></div>
+            </div>
         </section>
     </div>
 
@@ -207,8 +242,11 @@
     }
 
     function scrollDown(){
-        const h = $("history");
-        setTimeout(() => { h.scrollTop = h.scrollHeight; }, 60);
+        // #history scrolls in the two-column layout, #convo scrolls when stacked.
+        // Setting scrollTop on the one that isn't scrolling is a no-op.
+        setTimeout(() => {
+            [$("history"), $("convo")].forEach(el => { if (el) el.scrollTop = el.scrollHeight; });
+        }, 60);
     }
 
     /* ---------- WELCOME ---------- */
@@ -323,23 +361,43 @@
         scrollDown();
     }
 
-    function addClip(persona, url){
-        const d = document.createElement("div");
-        d.className = "vc";
-        d.innerHTML = `<div class="vc-name">${esc(persona || "A patient voice")}</div>
-            <video class="vc-vid" controls playsinline preload="metadata" src="${esc(url)}"></video>`;
-        $("messages").appendChild(d);
-        scrollDown();
-        const v = d.querySelector("video");
-        // While a patient speaks, the agent circle steps back. Counted once per element —
+    /* ---------- CLIP PANE — one persistent player, most recent clip only ---------- */
+
+    (function bindClipPlayer(){
+        const v = $("clipVid");
+        // While a patient speaks, the agent circle steps back. Counted once —
         // ending playback fires both `pause` and `ended`.
         let counted = false;
-        v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } });
         const release = () => { if (counted) { counted = false; P.playing--; updatePresence(); } };
+        v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } });
         v.addEventListener("pause", release);
-        v.addEventListener("ended", release);
-        // Try to play with sound; if the browser blocks it, the controls are already there.
-        v.play().catch(() => {});
+        v.addEventListener("ended", () => { release(); showReplay("Replay"); });
+        $("replay").addEventListener("click", () => {
+            $("replay").hidden = true;
+            v.currentTime = 0;
+            v.play().catch(() => { showReplay("Play"); });
+        });
+    })();
+
+    function showReplay(label){
+        const b = $("replay");
+        b.textContent = label;
+        b.hidden = false;
+    }
+
+    function showClip(persona, url){
+        const v = $("clipVid");
+        v.pause();                       // releases the presence "playing" state
+        $("clipName").textContent = persona || "A patient voice";
+        $("replay").hidden = true;
+        v.src = url;
+        $("clipPane").hidden = false;
+        // Try to play with sound; if the browser blocks it, offer an explicit play.
+        v.play().catch(() => { showReplay("Play"); });
+        // Stacked layout: hold the clip in view rather than following the text to the
+        // bottom. No-op on desktop, where #convo doesn't scroll. Runs after the text
+        // bubble's own scroll settles.
+        setTimeout(() => { $("convo").scrollTop = 0; }, 80);
     }
 
     function setBusy(on){
@@ -391,7 +449,7 @@
 
         if (r.match && r.matchUrl) {
             S.shownClips.push(r.match);
-            addClip(r.matchPersona, r.matchUrl);
+            showClip(r.matchPersona, r.matchUrl);
         }
 
         inp.focus({preventScroll: true});
