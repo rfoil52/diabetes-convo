@@ -386,9 +386,16 @@
         scheduleRotation();
     }
 
-    $("input").addEventListener("focus", () => { freezePrompt(); P.focused = true; updatePresence(); });
+    // Two reasons to hold a prompt still: the patient is in the input, or a patient voice
+    // is speaking. The prompts only cycle when neither is true. Both reasons are already
+    // tracked on P for the presence circle, so this reads them rather than duplicating them.
+    function syncRotation(){
+        if (P.focused || P.playing > 0) freezePrompt(); else resumePrompt();
+    }
+
+    $("input").addEventListener("focus", () => { P.focused = true; updatePresence(); syncRotation(); });
     $("input").addEventListener("click", freezePrompt);
-    $("input").addEventListener("blur", () => { resumePrompt(); P.focused = false; updatePresence(); });
+    $("input").addEventListener("blur", () => { P.focused = false; updatePresence(); syncRotation(); });
 
     /* ---------- CONVERSATION ---------- */
 
@@ -430,11 +437,14 @@
 
     (function bindClipPlayer(){
         const v = $("clipVid");
-        // While a patient speaks, the agent circle steps back. Counted once —
-        // ending playback fires both `pause` and `ended`.
+        // While a patient speaks, the agent circle steps back and the prompts hold still.
+        // Counted once — ending playback fires both `pause` and `ended`.
         let counted = false;
-        const release = () => { if (counted) { counted = false; P.playing--; updatePresence(); } };
-        v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } collapse(false); });
+        const release = () => { if (counted) { counted = false; P.playing--; updatePresence(); syncRotation(); } };
+        v.addEventListener("playing", () => {
+            if (!counted) { counted = true; P.playing++; updatePresence(); syncRotation(); }
+            collapse(false);
+        });
         v.addEventListener("pause", release);
         v.addEventListener("ended", () => { release(); collapse(true); showReplay("Replay"); });
         $("replay").addEventListener("click", () => {
@@ -487,8 +497,8 @@
         const text = inp.value.trim();
         if (!text || S.busy) return;
         inp.value = "";
-        inp.blur();       // hand the prompts back the moment the message is away
-        resumePrompt();
+        inp.blur();       // hand the prompts back the moment the message is away,
+        syncRotation();   // unless a clip is still speaking
 
         addBubble("user", text);
         S.messages.push({role: "user", content: text});
