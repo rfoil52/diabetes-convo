@@ -9,10 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--bg:#FBFAF6;--bg2:#F2F0E9;--bg3:#E3E0D6;--text:#1F1E1A;--text2:#6B6A62;--text3:#9C9A90;--accent:#5F7A5F;--accent-light:rgba(95,122,95,.08);--accent-mid:rgba(95,122,95,.18);--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',-apple-system,sans-serif}
-        body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+        :root{--bg:#FBFAF6;--bg2:#F2F0E9;--bg3:#E3E0D6;--page:#F0EDE5;--text:#1F1E1A;--text2:#6B6A62;--text3:#9C9A90;--accent:#5F7A5F;--accent-light:rgba(95,122,95,.08);--accent-mid:rgba(95,122,95,.18);--radius:12px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',-apple-system,sans-serif}
+        body{font-family:var(--sans);background:var(--page);color:var(--text);-webkit-font-smoothing:antialiased}
 
-        .app{max-width:720px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative}
+        /* The app is a rounded object floating on the darker page tone — never full-bleed.
+           Its corner radius matches the clip player's (--radius). */
+        .app{max-width:720px;width:calc(100% - 32px);margin:16px auto;height:calc(100dvh - 32px);display:flex;flex-direction:column;position:relative;background:var(--bg);border-radius:var(--radius);overflow:hidden}
 
         /* HEADER */
         .header{padding:18px 24px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:14px;flex-shrink:0}
@@ -31,11 +33,11 @@
         .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;border:none;background:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .3s ease}
         .play-btn:hover,.play-btn:focus-visible{transform:translate(-50%,-50%) scale(1.05)}
         .play-btn::before{content:"";display:block;margin-left:7px;border-left:28px solid #fff;border-top:17px solid transparent;border-bottom:17px solid transparent}
-        .welcome-cap{font-size:12px;color:var(--text3);line-height:1.5}
+        .welcome-cap{font-size:14px;color:var(--text2);line-height:1.5}
         .welcome-note{font-size:14px;color:var(--text2);line-height:1.6;max-width:420px}
         .welcome-actions{display:flex;flex-direction:column;align-items:center;gap:14px}
-        .skip{background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--text3);cursor:pointer;padding:6px 10px}
-        .skip:hover{color:var(--text2)}
+        .skip{background:none;border:none;font-family:var(--sans);font-size:14px;color:var(--text2);cursor:pointer;padding:6px 10px}
+        .skip:hover{color:var(--text)}
 
         .btn{padding:14px 40px;border-radius:28px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .15s}
         .btn:hover{opacity:.9}.btn:active{transform:scale(.97)}.btn:disabled{background:var(--bg3);cursor:default}
@@ -108,7 +110,7 @@
         .send-btn:disabled{background:var(--bg3);cursor:default}
 
         /* FOOTER */
-        .privacy{padding:0 24px calc(14px + env(safe-area-inset-bottom,6px));font-size:11px;line-height:1.5;color:var(--text3);text-align:center;flex-shrink:0}
+        .privacy{padding:0 24px calc(14px + env(safe-area-inset-bottom,6px));font-size:14px;line-height:1.5;color:var(--text2);text-align:center;flex-shrink:0}
 
         [hidden]{display:none !important}
 
@@ -142,19 +144,13 @@
         /* LARGE DESKTOP — two columns: interaction on the left, clip on the right.
            Widened container so the 40% column stays comfortably above its 320px minimum. */
         @media(min-width:900px){
-            .app{max-width:1080px}
+            /* Wider frame of page colour around the box on desktop. */
+            .app{max-width:1080px;width:calc(100% - 64px);margin:32px auto;height:calc(100dvh - 64px)}
             .header h1{font-size:24px}
             .bubble{font-size:17px;padding:16px 22px}
             .dot{margin-top:21px}
             .prompt{font-size:32px}
             .prompt-wrap{min-height:52px;margin-bottom:20px}
-
-            /* Soft envelope: 1px rules down the outer edges of the conversation area only —
-               never through the header or the privacy line. */
-            .stage{position:relative}
-            .stage::before,.stage::after{content:"";position:absolute;top:6px;bottom:6px;width:1px;background:rgba(31,30,26,.12);pointer-events:none}
-            .stage::before{left:0}
-            .stage::after{right:0}
 
             .convo{flex-direction:row;align-items:stretch;gap:28px;padding:0 24px;overflow:hidden}
             .talk-pane{order:1;flex:0 0 40%;min-width:320px;justify-content:center}
@@ -176,8 +172,8 @@
             .clip-pane.empty{display:flex}
             .clip-name{order:1;font-size:19px;padding:0 0 10px}
             .clip-frame{order:2;flex:1 1 auto;height:auto;max-height:none;overflow:visible}
-            .clip-vid{margin:auto;width:auto;height:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;object-position:center;border-radius:12px}
-            .clip-empty{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;border:1px solid var(--accent-mid);background:var(--accent-light);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:13px;line-height:1.6;color:var(--text3)}
+            .clip-vid{margin:auto;width:auto;height:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;object-position:center;border-radius:var(--radius)}
+            .clip-empty{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;border:1px solid var(--accent-mid);background:var(--accent-light);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:13px;line-height:1.6;color:var(--text3)}
             .clip-pane.empty .clip-vid,.clip-pane.empty .clip-name,.clip-pane.empty .replay{display:none}
         }
     </style>
@@ -251,8 +247,30 @@
     const HOLD = 4000;   // time a prompt stays fully visible
     const FADE = 700;    // crossfade duration — matches CSS transition
 
+    /* Shown clips persist on the device so a returning patient isn't handed the same
+       voice twice. Clip IDs only — no input, no timestamps, no personas — and every
+       storage call is guarded, since localStorage throws in private modes and when full.
+       If it's unavailable the queue simply falls back to session-only memory. */
+    const CLIPS_KEY = "diabetes_shown_clips";
+    const CLIPS_MAX = 20;
+
+    function loadShownClips(){
+        try {
+            const raw = localStorage.getItem(CLIPS_KEY);
+            if (!raw) return [];
+            const a = JSON.parse(raw);
+            return Array.isArray(a) ? a.filter(x => typeof x === "string").slice(-CLIPS_MAX) : [];
+        } catch (e) { return []; }
+    }
+
+    function rememberClip(id){
+        S.shownClips.push(id);
+        if (S.shownClips.length > CLIPS_MAX) S.shownClips = S.shownClips.slice(-CLIPS_MAX);
+        try { localStorage.setItem(CLIPS_KEY, JSON.stringify(S.shownClips)); } catch (e) {}
+    }
+
     // Client state: full message history + clips already shown, sent on every chat call
-    const S = {messages: [], shownClips: [], busy: false, started: false};
+    const S = {messages: [], shownClips: loadShownClips(), busy: false, started: false};
 
     const $ = id => document.getElementById(id);
     const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -313,6 +331,7 @@
         const v = $("wvid");
         v.muted = false;
         v.volume = 1;
+        v.controls = true;      // native pause/scrub/rewind, once it's actually playing
         $("play").hidden = true;
         // An explicit click almost always clears autoplay policy, but if sound is still
         // blocked, fall back to muted playback and offer the unmute button.
@@ -523,7 +542,7 @@
         }
 
         if (r.match && r.matchUrl) {
-            S.shownClips.push(r.match);
+            rememberClip(r.match);
             showClip(r.matchPersona, r.matchUrl);
         }
         // No refocus here either — the patient re-enters the field when they're ready,
