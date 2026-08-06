@@ -66,6 +66,10 @@
         .clip-vid{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;background:#000;border-radius:12px;display:block}
         .replay{background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--accent);cursor:pointer;padding:4px 10px}
         .replay:hover{opacity:.75}
+        /* Empty state — a quiet 9:16 placeholder holding the space a voice will occupy */
+        .clip-empty{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;border:1px solid var(--accent-mid);background:var(--accent-light);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:13px;line-height:1.6;color:var(--text3)}
+        .clip-pane.empty .clip-vid,.clip-pane.empty .clip-name,.clip-pane.empty .replay{display:none}
+        .clip-pane:not(.empty) .clip-empty{display:none}
 
         .typing{display:inline-flex;gap:5px;padding:16px 20px;background:var(--bg2);border-radius:20px 20px 20px 4px;margin:0 0 14px 22px}
         .typing span{width:8px;height:8px;border-radius:50%;background:var(--text3);animation:pulse 1.2s ease infinite}
@@ -100,11 +104,13 @@
         [hidden]{display:none !important}
 
         /* STACKED VIEWPORTS — before any clip has been surfaced there is nothing to stack,
-           so the interaction unit keeps the centered position it had on arrival. */
+           so the pane stays out of the flow and the interaction unit keeps the centered
+           position it had on arrival. */
         @media(max-width:899px){
-            .clip-pane[hidden]+.talk-pane{flex:1 1 auto}
-            .clip-pane[hidden]+.talk-pane .history{flex:1 1 0;min-height:0;overflow-y:auto}
-            .clip-pane[hidden]+.talk-pane .tail{display:block;flex:1 1 0;min-height:0}
+            .clip-pane.empty{display:none}
+            .clip-pane.empty+.talk-pane{flex:1 1 auto}
+            .clip-pane.empty+.talk-pane .history{flex:1 1 0;min-height:0;overflow-y:auto}
+            .clip-pane.empty+.talk-pane .tail{display:block;flex:1 1 0;min-height:0}
         }
 
         /* MOBILE */
@@ -147,13 +153,15 @@
 
             .convo{flex-direction:row;align-items:stretch;gap:28px;padding:0 24px;overflow:hidden}
             .talk-pane{order:1;flex:0 0 40%;min-width:320px}
-            .clip-pane[hidden]+.talk-pane{margin-inline:auto}
-            .history{flex:1 1 0;min-height:0;overflow-y:auto;padding:0}
-            .history-inner{padding-top:20px}
-            .tail{display:block;flex:1 1 0;min-height:0}
+            /* History sizes to its content and shrinks/scrolls once it runs out of room,
+               so the interaction unit starts at the top of the column — level with the
+               clip pane — and is pushed down as responses accumulate. */
+            .history{flex:0 1 auto;min-height:0;overflow-y:auto;padding:0}
+            .history-inner{padding-top:0}
+            .tail{display:block;flex:1 1 auto;min-height:0}
             .interaction{padding:20px 0 0}
 
-            .clip-pane{order:2;flex:1 1 60%;max-width:480px;padding:20px 0;justify-content:center}
+            .clip-pane{order:2;flex:1 1 60%;max-width:480px;padding:20px 0 0;justify-content:flex-start}
             .clip-name{font-size:19px}
             .clip-frame{flex:1 1 auto;height:auto;max-height:none}
         }
@@ -186,10 +194,11 @@
 
         <!-- CONVERSATION -->
         <section class="convo" id="convo" hidden>
-            <div class="clip-pane" id="clipPane" hidden>
+            <div class="clip-pane empty" id="clipPane">
                 <div class="clip-name" id="clipName"></div>
                 <div class="clip-frame">
                     <video class="clip-vid" id="clipVid" controls playsinline preload="metadata"></video>
+                    <div class="clip-empty">A patient voice will appear here when one matches what you're sharing.</div>
                 </div>
                 <button class="replay" id="replay" hidden>Replay</button>
             </div>
@@ -241,11 +250,24 @@
         return r.json();
     }
 
+    const HEADROOM = 12;  // visible space left above a newly arrived agent message
+
+    // #history scrolls in the two-column layout, #convo scrolls when stacked.
+    // Setting scrollTop on the one that isn't scrolling is a no-op.
+    function scrollers(){ return [$("history"), $("convo")].filter(Boolean); }
+
     function scrollDown(){
-        // #history scrolls in the two-column layout, #convo scrolls when stacked.
-        // Setting scrollTop on the one that isn't scrolling is a no-op.
+        setTimeout(() => { scrollers().forEach(el => { el.scrollTop = el.scrollHeight; }); }, 60);
+    }
+
+    // Land the scroll so `el`'s top edge sits HEADROOM below the top of the visible
+    // history area. Clamps naturally when there isn't that much to scroll.
+    function scrollToNew(el){
         setTimeout(() => {
-            [$("history"), $("convo")].forEach(el => { if (el) el.scrollTop = el.scrollHeight; });
+            scrollers().forEach(c => {
+                const delta = el.getBoundingClientRect().top - c.getBoundingClientRect().top - HEADROOM;
+                c.scrollTop += delta;
+            });
         }, 60);
     }
 
@@ -302,8 +324,9 @@
         v.pause();
         $("welcome").hidden = true;
         $("convo").hidden = false;
+        // Deliberately not focusing the input — focus freezes the rotation, and the
+        // prompts should be cycling when the patient arrives.
         startPromptRotation();
-        $("input").focus({preventScroll: true});
     }
 
     /* ---------- ROTATING PROMPT ---------- */
@@ -311,10 +334,18 @@
     let promptIdx = 0, promptTimer = null, frozen = false;
 
     function startPromptRotation(){
-        const p = $("prompt");
-        p.textContent = PROMPTS[0];
+        $("prompt").textContent = PROMPTS[promptIdx];
+        frozen = false;
+        scheduleRotation();
+    }
+
+    // Rotation runs on a restartable timer so it can be frozen and picked back up
+    // any number of times across the conversation.
+    function scheduleRotation(){
+        clearInterval(promptTimer);
         promptTimer = setInterval(() => {
             if (frozen) return;
+            const p = $("prompt");
             p.classList.add("out");
             setTimeout(() => {
                 if (frozen) { p.classList.remove("out"); return; }
@@ -332,9 +363,16 @@
         $("prompt").classList.remove("out"); // hold whatever is currently visible
     }
 
+    function resumePrompt(){
+        if (!frozen) return;
+        frozen = false;
+        $("prompt").classList.remove("out"); // resume from the prompt that was held
+        scheduleRotation();
+    }
+
     $("input").addEventListener("focus", () => { freezePrompt(); P.focused = true; updatePresence(); });
     $("input").addEventListener("click", freezePrompt);
-    $("input").addEventListener("blur", () => { P.focused = false; updatePresence(); });
+    $("input").addEventListener("blur", () => { resumePrompt(); P.focused = false; updatePresence(); });
 
     /* ---------- CONVERSATION ---------- */
 
@@ -358,7 +396,7 @@
         const dot = role === "user" ? "" : `<span class="dot" aria-hidden="true"></span>`;
         d.innerHTML = `${dot}<div class="bubble">${esc(text).replace(/\n/g, "<br>")}</div>`;
         $("messages").appendChild(d);
-        scrollDown();
+        if (role === "user") scrollDown(); else scrollToNew(d);
     }
 
     /* ---------- CLIP PANE — one persistent player, most recent clip only ---------- */
@@ -391,7 +429,7 @@
         $("clipName").textContent = persona || "A patient voice";
         $("replay").hidden = true;
         v.src = url;
-        $("clipPane").hidden = false;
+        $("clipPane").classList.remove("empty");
         // Try to play with sound; if the browser blocks it, offer an explicit play.
         v.play().catch(() => { showReplay("Play"); });
         // Stacked layout: hold the clip in view rather than following the text to the
@@ -423,7 +461,8 @@
         const text = inp.value.trim();
         if (!text || S.busy) return;
         inp.value = "";
-        freezePrompt();
+        inp.blur();       // hand the prompts back the moment the message is away
+        resumePrompt();
 
         addBubble("user", text);
         S.messages.push({role: "user", content: text});
@@ -451,8 +490,8 @@
             S.shownClips.push(r.match);
             showClip(r.matchPersona, r.matchUrl);
         }
-
-        inp.focus({preventScroll: true});
+        // No refocus here either — the patient re-enters the field when they're ready,
+        // and the prompts keep cycling until they do.
     }
 
     $("send").addEventListener("click", send);
