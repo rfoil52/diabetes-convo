@@ -111,9 +111,9 @@
 
         /* MIC — sits inside the field, ahead of the Send button. Only ever rendered when
            the browser exposes a speech recognition API; otherwise the field is unchanged. */
-        .input-wrap.has-mic input{padding-right:46px}
-        .mic-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;padding:0;border:none;background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .3s ease}
-        .mic-btn svg{width:18px;height:18px;display:block}
+        .input-wrap.has-mic input{padding-right:50px}
+        .mic-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;padding:0;border:none;background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .3s ease}
+        .mic-btn svg{width:21px;height:21px;display:block}
         .mic-btn:hover,.mic-btn:focus-visible{color:var(--text)}
         .mic-btn.recording{color:var(--accent);animation:mic-pulse 1.5s ease-in-out infinite}
         .mic-btn.denied,.mic-btn.denied:hover,.mic-btn:disabled{color:var(--text3);cursor:default;animation:none}
@@ -149,7 +149,7 @@
             .prompt{font-size:24px}
             .input-bar{gap:8px}
             .input-bar input{padding:12px 14px;font-size:16px}
-            .input-wrap.has-mic input{padding-right:42px}
+            .input-wrap.has-mic input{padding-right:46px}
             .mic-btn{right:10px}
             .send-btn{padding:12px 18px;font-size:15px}
             .btn{font-size:15px;padding:13px 32px}
@@ -232,7 +232,7 @@
                 <div class="conversation-frame">
                     <div class="history" id="history"><div class="history-inner" id="messages"></div></div>
                     <div class="interaction">
-                        <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
+                        <div class="prompt-wrap" id="promptWrap"><div class="prompt" id="prompt"></div></div>
                         <div class="input-bar">
                             <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
                             <div class="input-wrap" id="inputWrap">
@@ -386,7 +386,19 @@
 
     /* ---------- ROTATING PROMPT ---------- */
 
-    let promptIdx = 0, promptTimer = null, frozen = false;
+    // The prompts are icebreakers. They rotate until the patient's first message, then
+    // retire for the session — after that the agent asks the questions, and two competing
+    // questions on screen would only make the patient hesitate.
+    let promptIdx = 0, promptTimer = null, frozen = false, promptsRetired = false;
+
+    function retirePrompts(){
+        if (promptsRetired) return;
+        promptsRetired = true;
+        frozen = true;
+        clearInterval(promptTimer);
+        $("promptWrap").hidden = true;              // removed from flow — no leftover gap
+        $("input").placeholder = "Continue...";
+    }
 
     function startPromptRotation(){
         $("prompt").textContent = PROMPTS[promptIdx];
@@ -419,7 +431,7 @@
     }
 
     function resumePrompt(){
-        if (!frozen) return;
+        if (promptsRetired || !frozen) return;      // retirement outranks every resume path
         frozen = false;
         $("prompt").classList.remove("out"); // resume from the prompt that was held
         scheduleRotation();
@@ -430,6 +442,7 @@
     // none is true. All three are already tracked on P for the presence circle, so this
     // reads them rather than duplicating them.
     function syncRotation(){
+        if (promptsRetired) return;
         if (P.focused || P.recording || P.playing > 0) freezePrompt(); else resumePrompt();
     }
 
@@ -540,8 +553,8 @@
         if (!text || S.busy) return;
         stopVoice();      // a message going out ends any utterance still in progress
         inp.value = "";
-        inp.blur();       // hand the prompts back the moment the message is away,
-        syncRotation();   // unless a clip is still speaking
+        inp.blur();
+        retirePrompts();  // icebreakers are done — the agent leads from here
 
         addBubble("user", text);
         S.messages.push({role: "user", content: text});
