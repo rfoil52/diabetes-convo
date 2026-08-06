@@ -23,10 +23,11 @@
         /* STAGE */
         .stage{flex:1;display:flex;flex-direction:column;min-height:0}
 
-        /* WELCOME */
-        .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:20px}
-        .welcome-media{position:relative;width:100%;max-width:560px}
-        .welcome-vid{width:100%;border-radius:14px;background:#000;display:block;box-shadow:0 2px 24px rgba(31,30,26,.07)}
+        /* WELCOME — RT_intro.mp4 is 1080x1920, so the box is declared 9:16 up front and
+           sized by height. Nothing reshapes when metadata arrives. */
+        .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:20px;overflow-y:auto}
+        .welcome-media{position:relative;display:flex;justify-content:center;max-width:100%}
+        .welcome-vid{aspect-ratio:9/16;height:min(56vh,480px);width:auto;max-width:100%;object-fit:contain;border-radius:14px;background:#000;display:block;box-shadow:0 2px 24px rgba(31,30,26,.07)}
         .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;border:none;background:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .3s ease}
         .play-btn:hover,.play-btn:focus-visible{transform:translate(-50%,-50%) scale(1.05)}
         .play-btn::before{content:"";display:block;margin-left:7px;border-left:28px solid #fff;border-top:17px solid transparent;border-bottom:17px solid transparent}
@@ -41,14 +42,15 @@
         .btn-outline{background:transparent;border:1px solid var(--accent-mid);color:var(--accent)}
         .btn-outline:hover{background:var(--accent-light)}
 
-        /* CONVERSATION — base layout is the stacked one (< 900px): clip on top, then the
-           agent text, then the interaction unit; the whole column scrolls.
+        /* CONVERSATION — base layout is the stacked one (< 900px): the clip area sits at the
+           top and only occupies space while a clip is playing, history scrolls in the middle,
+           and the input controls stay pinned to the bottom of the viewport at all times.
            The two-column desktop layout is in the min-width:900px block below. */
-        .convo{flex:1;display:flex;flex-direction:column;min-height:0;overflow-y:auto;scroll-behavior:smooth}
-        .talk-pane{display:flex;flex-direction:column;flex:0 0 auto;min-height:0}
-        .history{display:flex;flex-direction:column;padding:0 24px;scroll-behavior:smooth}
+        .convo{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+        .talk-pane{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+        .conversation-frame{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;width:100%}
+        .history{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 24px;scroll-behavior:smooth}
         .history-inner{margin-top:auto;padding-top:24px}
-        .tail{display:none}
         .msg{margin-bottom:14px;display:flex;flex-direction:column}
         .msg.agent{flex-direction:row;align-items:flex-start;gap:10px}.msg.user{align-items:flex-end}
         .bubble{max-width:82%;padding:14px 20px;font-size:16px;line-height:1.7}
@@ -58,18 +60,22 @@
         /* SPEAKING — static dot beside each agent message */
         .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);opacity:1;flex-shrink:0;margin-top:18px;box-shadow:0 0 6px rgba(95,122,95,.2)}
 
-        /* CLIP PANE — holds only the most recent clip. The video is absolutely fitted inside
-           .clip-frame so 1080x1920 source scales to fit both axes: letterboxed, never cropped. */
-        .clip-pane{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 auto;min-height:0;padding:16px 24px 0;gap:10px}
-        .clip-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--text);text-align:center}
-        .clip-frame{position:relative;width:100%;height:60vh;max-height:60vh}
-        .clip-vid{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;background:#000;border-radius:12px;display:block}
-        .replay{background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--accent);cursor:pointer;padding:4px 10px}
+        /* CLIP PANE — holds only the most recent clip.
+           Stacked: full-bleed, cropped to the top of the 9:16 frame (face and upper body),
+           collapsing to nothing whenever the clip isn't playing. The persona name strip
+           sits below the video here and above it on desktop (see `order`). */
+        .clip-pane{display:flex;flex-direction:column;flex:0 0 auto;min-height:0;padding:0}
+        .clip-frame{order:1;position:relative;width:100%;height:45vh;max-height:45vh;overflow:hidden;opacity:1;transition:max-height .45s ease,opacity .45s ease}
+        .clip-name{order:2;font-family:var(--serif);font-size:16px;font-weight:400;color:var(--text);text-align:center;padding:8px 14px 0}
+        .replay{order:3;align-self:center;background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--accent);cursor:pointer;padding:4px 10px}
         .replay:hover{opacity:.75}
-        /* Empty state — a quiet 9:16 placeholder holding the space a voice will occupy */
-        .clip-empty{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;border:1px solid var(--accent-mid);background:var(--accent-light);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:13px;line-height:1.6;color:var(--text3)}
-        .clip-pane.empty .clip-vid,.clip-pane.empty .clip-name,.clip-pane.empty .replay{display:none}
+        .clip-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;background:#000;display:block}
+        /* Not playing: the video area gives its space back, the name strip stays so the
+           clip can be brought back. */
+        .clip-pane.collapsed .clip-frame{max-height:0;opacity:0}
+        .clip-pane.empty{display:none}
         .clip-pane:not(.empty) .clip-empty{display:none}
+        @media(prefers-reduced-motion:reduce){.clip-frame{transition:none}}
 
         .typing{display:inline-flex;gap:5px;padding:16px 20px;background:var(--bg2);border-radius:20px 20px 20px 4px;margin:0 0 14px 22px}
         .typing span{width:8px;height:8px;border-radius:50%;background:var(--text3);animation:pulse 1.2s ease infinite}
@@ -103,16 +109,6 @@
 
         [hidden]{display:none !important}
 
-        /* STACKED VIEWPORTS — before any clip has been surfaced there is nothing to stack,
-           so the pane stays out of the flow and the interaction unit keeps the centered
-           position it had on arrival. */
-        @media(max-width:899px){
-            .clip-pane.empty{display:none}
-            .clip-pane.empty+.talk-pane{flex:1 1 auto}
-            .clip-pane.empty+.talk-pane .history{flex:1 1 0;min-height:0;overflow-y:auto}
-            .clip-pane.empty+.talk-pane .tail{display:block;flex:1 1 0;min-height:0}
-        }
-
         /* MOBILE */
         @media(max-width:600px){
             .app{max-width:100%}
@@ -129,8 +125,7 @@
             .msg.agent{gap:8px}
             .dot{margin-top:15px}
             .typing{margin-left:20px}
-            .clip-pane{padding:12px 14px 0}
-            .clip-name{font-size:16px}
+            .clip-name{font-size:15px;padding:6px 14px 0}
             .interaction{padding:16px 14px 0}
             .prompt-wrap{min-height:38px;margin-bottom:16px}
             .prompt{font-size:24px}
@@ -151,19 +146,34 @@
             .prompt{font-size:32px}
             .prompt-wrap{min-height:52px;margin-bottom:20px}
 
+            /* Soft envelope: 1px rules down the outer edges of the conversation area only —
+               never through the header or the privacy line. */
+            .stage{position:relative}
+            .stage::before,.stage::after{content:"";position:absolute;top:6px;bottom:6px;width:1px;background:rgba(31,30,26,.12);pointer-events:none}
+            .stage::before{left:0}
+            .stage::after{right:0}
+
             .convo{flex-direction:row;align-items:stretch;gap:28px;padding:0 24px;overflow:hidden}
-            .talk-pane{order:1;flex:0 0 40%;min-width:320px}
-            /* History sizes to its content and shrinks/scrolls once it runs out of room,
-               so the interaction unit starts at the top of the column — level with the
-               clip pane — and is pushed down as responses accumulate. */
-            .history{flex:0 1 auto;min-height:0;overflow-y:auto;padding:0}
+            .talk-pane{order:1;flex:0 0 40%;min-width:320px;justify-content:center}
+
+            /* The conversation frame is a bounded box at 65% of the clip pane's height,
+               centered in the column. The clip pane is the column height capped at 800px,
+               so min(65%, 520px) is that same 65% under both regimes. History scrolls
+               inside the frame; the input controls stay put at its bottom edge. */
+            .conversation-frame{flex:0 0 auto;height:min(65%,520px)}
+            .history{padding:0}
             .history-inner{padding-top:0}
-            .tail{display:block;flex:1 1 auto;min-height:0}
             .interaction{padding:20px 0 0}
 
-            .clip-pane{order:2;flex:1 1 60%;max-width:480px;padding:20px 0 0;justify-content:flex-start}
-            .clip-name{font-size:19px}
-            .clip-frame{flex:1 1 auto;height:auto;max-height:none}
+            /* Letterboxed, never cropped — the stacked layout's cover-crop is undone here. */
+            .clip-pane{order:2;flex:1 1 60%;max-width:480px;max-height:800px;align-self:center;padding:20px 0 0;align-items:center;justify-content:flex-start}
+            .clip-pane.empty{display:flex}
+            .clip-pane.collapsed .clip-frame{max-height:none;opacity:1}
+            .clip-name{order:1;font-size:19px;padding:0 0 10px}
+            .clip-frame{order:2;flex:1 1 auto;height:auto;max-height:none;overflow:visible}
+            .clip-vid{margin:auto;width:auto;height:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;object-position:center;border-radius:12px}
+            .clip-empty{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;aspect-ratio:9/16;border:1px solid var(--accent-mid);background:var(--accent-light);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:13px;line-height:1.6;color:var(--text3)}
+            .clip-pane.empty .clip-vid,.clip-pane.empty .clip-name,.clip-pane.empty .replay{display:none}
         }
     </style>
 </head>
@@ -203,16 +213,17 @@
                 <button class="replay" id="replay" hidden>Replay</button>
             </div>
             <div class="talk-pane">
-                <div class="history" id="history"><div class="history-inner" id="messages"></div></div>
-                <div class="interaction">
-                    <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
-                    <div class="input-bar">
-                        <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
-                        <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
-                        <button class="send-btn" id="send">Send</button>
+                <div class="conversation-frame">
+                    <div class="history" id="history"><div class="history-inner" id="messages"></div></div>
+                    <div class="interaction">
+                        <div class="prompt-wrap"><div class="prompt" id="prompt"></div></div>
+                        <div class="input-bar">
+                            <div class="presence-slot"><div class="presence" id="presence" data-state="idle" aria-hidden="true"></div></div>
+                            <input id="input" type="text" placeholder="Or type anything..." autocomplete="off" />
+                            <button class="send-btn" id="send">Send</button>
+                        </div>
                     </div>
                 </div>
-                <div class="tail" aria-hidden="true"></div>
             </div>
         </section>
     </div>
@@ -407,9 +418,13 @@
         // ending playback fires both `pause` and `ended`.
         let counted = false;
         const release = () => { if (counted) { counted = false; P.playing--; updatePresence(); } };
-        v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } });
+        // The `collapsed` class only does anything in the stacked layout, where the video
+        // area gives its space back once a clip has run to the end. A mid-clip pause leaves
+        // it open so playback can be resumed without the layout jumping.
+        const collapse = on => $("clipPane").classList.toggle("collapsed", on);
+        v.addEventListener("playing", () => { if (!counted) { counted = true; P.playing++; updatePresence(); } collapse(false); });
         v.addEventListener("pause", release);
-        v.addEventListener("ended", () => { release(); showReplay("Replay"); });
+        v.addEventListener("ended", () => { release(); collapse(true); showReplay("Replay"); });
         $("replay").addEventListener("click", () => {
             $("replay").hidden = true;
             v.currentTime = 0;
@@ -429,13 +444,12 @@
         $("clipName").textContent = persona || "A patient voice";
         $("replay").hidden = true;
         v.src = url;
-        $("clipPane").classList.remove("empty");
-        // Try to play with sound; if the browser blocks it, offer an explicit play.
-        v.play().catch(() => { showReplay("Play"); });
-        // Stacked layout: hold the clip in view rather than following the text to the
-        // bottom. No-op on desktop, where #convo doesn't scroll. Runs after the text
-        // bubble's own scroll settles.
-        setTimeout(() => { $("convo").scrollTop = 0; }, 80);
+        const pane = $("clipPane");
+        pane.classList.remove("empty");
+        pane.classList.remove("collapsed");   // open the stacked video area for the new clip
+        // Try to play with sound; if the browser blocks it, offer an explicit play and give
+        // the space back until they take it.
+        v.play().catch(() => { pane.classList.add("collapsed"); showReplay("Play"); });
     }
 
     function setBusy(on){
