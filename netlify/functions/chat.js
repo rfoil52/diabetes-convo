@@ -167,7 +167,7 @@ export default async (req) => {
       });
 
       if (!r.ok) {
-        console.error("Claude error", r.status);
+        const errorBody = await r.text(); console.error("Claude error", r.status, errorBody);
         return new Response(JSON.stringify({error:"API error"}), {status:502, headers:H});
       }
 
