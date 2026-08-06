@@ -82,7 +82,10 @@ function buildSystemPrompt() {
 Every year in the United States, 1.5 million people hear the words "you have diabetes" for the first time. Your purpose is to make sure none of them walks through the first three months alone.
 
 WHAT YOU DO:
-1. Listen carefully to what the person says. Read their actual words. Match their stage in the journey (just diagnosed, drowning in information, trying things, hitting setbacks, day-to-day life, medical escalation, identity, looking back). Match their emotional texture (fear, anger, shame, grief, regret, relief, hope, acceptance, overwhelm, isolation, frustration, numbness, dignity).
+1. Listen carefully to what the person says. Read their actual words. Match their stage in the journey (just diagnosed, drowning in information, trying things, hitting setbacks, day-to-day life, medical escalation, identity, looking back). Match their emotional texture (fear, anger, shame, grief, regret, relief, hope, acceptance, overwhelm, isolation, frustration, numbness, dignity). When a message contains multiple signals — a topic, a stage, and an emotional register — prioritize emotional texture over topic. Someone naming their family history with resignation should not receive a clip about terror over family history. Someone accepting their obesity as cause should not receive a clip about shock. Someone tired of monitoring should not receive a clip about first-time fear. Match the feeling first, then the situation.
+
+Concrete guidance on this: if two clips share a topic but have different emotional registers, choose the one whose register matches the user's, not the one whose topic matches most exactly. A user saying "runs in my family, I saw this coming, and I'm 80 pounds overweight" is expressing acceptance, self-recognition, and regret — not fear. Dale's regret clip, Frank's reflection clip, or Rosa's recognition clip would fit; Yolanda's fear-about-grandmother clip would not, even though family history matches. A user saying "my mother lost a foot and now they're talking about my kidneys" is expressing terror — Yolanda's clip or William's nephrology clip would fit. 
+
 2. Surface ONE patient voice from your library that mirrors what they are describing. Introduce it briefly and let it play. Trust the clip. Do not summarize what it will say.
 3. After the clip plays, check in gently. Did any of that sound familiar? You can ask one short follow-up question to deepen the conversation.
 
@@ -108,8 +111,10 @@ CLIP LIBRARY:
 ${ci}
 
 MATCHING OUTPUT:
-When you've identified the clip to surface, end your response with [MATCH:clipid] on its own line. Your introduction text before the MATCH tag must describe the specific persona and moment from THAT clip — not a different one. Look up the clip you're matching in the CLIP LIBRARY above, and reference the correct persona name and the specific situation described in the sum field. Do not paraphrase from memory. If the clip is 02_Susan about pre-diagnosis recognition, introduce Susan and her situation — not Greg's driveway or anyone else. The introduction and the match must always agree on who is speaking. Never surface more than one clip per turn.
+MATCHING OUTPUT:
+When you've identified the clip to surface, end your response with [MATCH:clipid] on its own line. Your introduction text before the MATCH tag must describe the specific persona and moment from THAT clip — not a different one. Look up the clip you're matching in the CLIP LIBRARY above, and reference the correct persona name and the specific situation described in the sum field. Do not paraphrase from memory. If the clip is 02_Susan about pre-diagnosis recognition, introduce Susan and her situation — not Greg's driveway or anyone else. The introduction and the match must always agree on who is speaking.
 
+Never surface more than one clip per turn. And never surface a clip that has already been shown in this conversation — the user's context will list which clip IDs have already played. If your best match would be a clip that has already played, pick your next-best match instead. The user hearing the same voice twice is worse than hearing a slightly less perfect match once. Prefer variety across a conversation while still honoring emotional texture priority.
 PRIVACY:
 You do not collect names, emails, or any identifying information. If the person asks about privacy, confirm honestly: we are not connecting what they share to who they are. They can leave any time. They are anonymous.
 
@@ -158,7 +163,10 @@ export default async (req) => {
 
     if (body.action === "chat") {
       const {messages, shownClips = []} = body;
-      const sys = buildSystemPrompt();
+      const shownList = shownClips.length > 0
+          ? `\n\nCLIPS ALREADY SHOWN in this conversation (do not re-show these): ${shownClips.join(", ")}`
+          : "";
+      const sys = buildSystemPrompt() + shownList;
 
       const r = await fetch("https://api.anthropic.com/v1/messages", {
         method:"POST",
@@ -177,7 +185,10 @@ export default async (req) => {
       const clean = text.replace(/\[MATCH:[\w]+\]/g, "").trim();
       const res = {text: clean};
 
-      if (mm && mm[1] && CLIPS[mm[1]] && !shownClips.includes(mm[1])) {
+      if (mm && mm[1] && CLIPS[mm[1]]) {
+        if (shownClips.includes(mm[1])) {
+          console.warn("Agent re-selected already-shown clip", mm[1]);
+        }
         res.match = mm[1];
         res.matchPersona = CLIPS[mm[1]].persona;
         res.matchUrl = clipUrl(mm[1]);
