@@ -71,7 +71,10 @@
         .clip-name{order:2;font-family:var(--serif);font-size:16px;font-weight:400;color:var(--text);text-align:center;padding:8px 14px 0}
         .replay{order:3;align-self:center;background:none;border:none;font-family:var(--sans);font-size:13px;color:var(--accent);cursor:pointer;padding:4px 10px}
         .replay:hover{opacity:.75}
-        .clip-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;background:#000;display:block}
+        
+video::-webkit-media-text-track-container{transform:translateY(-9%)!important}
+video::cue{background:rgba(0,0,0,.72);color:#fff;font-size:.95em;line-height:1.35}
+        .clip-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;background:#000;display:block}
         /* Ended: the video area gives its space back, the name strip stays so the clip can
            be brought back. Scoped to the stacked layout — above 900px the class has no
            visual effect at all, so a stray `collapsed` can never hide a desktop clip. */
