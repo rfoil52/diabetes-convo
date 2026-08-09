@@ -207,7 +207,7 @@
         <!-- WELCOME -->
         <section class="welcome" id="welcome">
             <div class="welcome-media">
-                <video class="welcome-vid" id="wvid" playsinline preload="metadata"></video>
+                <video class="welcome-vid" id="wvid" crossorigin="anonymous" playsinline preload="metadata"></video>
                 <button class="play-btn" id="play" aria-label="Play the welcome message"></button>
             </div>
             <p class="welcome-cap">A message from Randall, then a library of voices.</p>
@@ -223,7 +223,7 @@
             <div class="clip-pane empty" id="clipPane">
                 <div class="clip-name" id="clipName"></div>
                 <div class="clip-frame">
-                    <video class="clip-vid" id="clipVid" controls playsinline preload="metadata"></video>
+                    <video class="clip-vid" id="clipVid" crossorigin="anonymous" controls playsinline preload="metadata"></video>
                     <div class="clip-empty">A patient voice will appear here when one matches what you're sharing.</div>
                 </div>
                 <button class="replay" id="replay" hidden>Replay</button>
@@ -271,7 +271,7 @@
        voice twice. Clip IDs only — no input, no timestamps, no personas — and every
        storage call is guarded, since localStorage throws in private modes and when full.
        If it's unavailable the queue simply falls back to session-only memory. */
-    const CLIPS_KEY = "diabetes_shown_clips";
+    const CLIPS_KEY = "rc_seen";   // deliberately uninformative: this sits on the patient's device
     const CLIPS_MAX = 20;
 
     function loadShownClips(){
@@ -342,6 +342,7 @@
 
         const v = $("wvid");
         v.src = data.welcomeUrl;
+        setTrack(v, data.welcomeCaptionUrl);
         v.addEventListener("ended", startConversation, {once: true});
         v.addEventListener("error", welcomeFailed, {once: true});
         // No autoplay — the video waits on the play button.
@@ -508,18 +509,37 @@
         });
     })();
 
+    /* Captions. A <track> element does NOT reload when video.src changes, so the old
+       track has to be removed and a new one appended for every clip — otherwise clip two
+       plays with clip one's captions. Requires crossorigin on the <video> and CORS on the
+       bucket; without either the track fails silently, with no error and no captions. */
+    function setTrack(video, url){
+        video.querySelectorAll("track").forEach(t => t.remove());
+        if (!url) return;
+        const t = document.createElement("track");
+        t.kind = "captions";
+        t.label = "English";
+        t.srclang = "en";
+        t.src = url;
+        t.default = true;
+        video.appendChild(t);
+        // Safari and Firefox don't always honour `default` on a track added after load.
+        try { if (video.textTracks.length) video.textTracks[0].mode = "showing"; } catch (e) {}
+    }
+
     function showReplay(label){
         const b = $("replay");
         b.textContent = label;
         b.hidden = false;
     }
 
-    function showClip(persona, url){
+    function showClip(persona, url, captionUrl){
         const v = $("clipVid");
         v.pause();                       // releases the presence "playing" state
         $("clipName").textContent = persona || "A patient voice";
         $("replay").hidden = true;
         v.src = url;
+        setTrack(v, captionUrl);
         const pane = $("clipPane");
         pane.classList.remove("empty");
         pane.classList.remove("collapsed");   // open the stacked video area for the new clip
@@ -580,7 +600,7 @@
 
         if (r.match && r.matchUrl) {
             rememberClip(r.match);
-            showClip(r.matchPersona, r.matchUrl);
+            showClip(r.matchPersona, r.matchUrl, r.matchCaptionUrl);
         }
         // No refocus here either — the patient re-enters the field when they're ready,
         // and the prompts keep cycling until they do.
