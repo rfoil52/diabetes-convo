@@ -345,6 +345,7 @@ video::cue{background:rgba(0,0,0,.72);color:#fff;font-size:.95em;line-height:1.3
 
         const v = $("wvid");
         v.src = data.welcomeUrl;
+        v.poster = data.welcomeUrl.replace(/\.mp4$/, ".jpg");
         setTrack(v, data.welcomeCaptionUrl);
         v.addEventListener("ended", startConversation, {once: true});
         v.addEventListener("error", welcomeFailed, {once: true});
